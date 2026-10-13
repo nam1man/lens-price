@@ -1,184 +1,372 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
 
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
+/* 기본 설정 */
+* {
+  box-sizing: border-box;
 }
 
-.hero {
-  position: relative;
-
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
+:root {
+  font-family: Arial, "Noto Sans KR", sans-serif;
+  color: #222;
+  background: #f5f6f8;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
 }
 
-#center {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
-
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
+body {
+  margin: 0;
+  min-width: 320px;
+  font-size: 15px;
 }
 
-#next-steps {
-  display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
-
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
+button,
+input {
+  font: inherit;
 }
 
-#docs {
-  border-right: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
+button {
+  cursor: pointer;
 }
 
-#next-steps ul {
-  list-style: none;
-  padding: 0;
+/* 전체 화면 */
+.app {
+  width: 100%;
+  max-width: 900px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 28px 24px;
+  background: #fff;
+}
+
+.header {
+  padding: 12px 0 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.logo {
+  color: #9b7b42;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.header h1 {
+  margin: 12px 0 8px;
+  font-size: 28px;
+  line-height: 1.35;
+}
+
+.header p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+/* 검색과 브랜드 선택 */
+.results {
+  padding-top: 20px;
+}
+
+.connection-status {
+  color: #25824b;
+  font-size: 12px;
+}
+
+.error-message {
+  color: #c62828;
+  overflow-wrap: anywhere;
+}
+
+.search-input {
+  display: block;
+  width: 100%;
+  min-height: 46px;
+  margin: 16px 0;
+  padding: 12px 14px;
+  border: 1px solid #d7dbe0;
+  border-radius: 10px;
+  background: #fff;
+  outline: none;
+}
+
+.search-input:focus,
+input:focus {
+  border-color: #9b7b42;
+}
+
+.brand-filter {
   display: flex;
   gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
-}
-
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
-}
-
-.ticks {
-  position: relative;
   width: 100%;
+  padding: 4px 0 12px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
+.brand-filter-button {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 8px 14px;
+  border: 1px solid #dfe2e6;
+  border-radius: 20px;
+  background: #fff;
+  color: #444;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.brand-filter-button.active {
+  color: #fff;
+  background: #252525;
+  border-color: #252525;
+}
+
+.result-count {
+  margin: 12px 0;
+  color: #666;
+  font-size: 13px;
+}
+
+/* 상품 목록 */
+.lens-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lens-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.lens-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.brand-name {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  color: #705522;
+  background: #f5efdf;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.lens-card h2 {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.lens-specification {
+  margin: 6px 0 0;
+  color: #777;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.lens-price {
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.lens-price > strong {
+  display: block;
+  color: #222;
+  font-size: 18px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.admin-actions button,
+.admin-panel button,
+.results > button {
+  padding: 8px 12px;
+  border: 1px solid #d7dbe0;
+  border-radius: 7px;
+  background: #fff;
+  color: #333;
+  font-size: 13px;
+}
+
+.empty-results {
+  padding: 30px 12px;
+  color: #777;
+  text-align: center;
+}
+
+hr {
+  margin: 24px 0;
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* 관리자 화면 */
+.admin-panel {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.admin-panel h2 {
+  font-size: 18px;
+}
+
+.admin-panel input {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  margin: 10px 0;
+  padding: 10px 12px;
+  border: 1px solid #d7dbe0;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.admin-panel button {
+  margin: 4px 5px 4px 0;
+}
+
+footer {
+  padding: 28px 0 10px;
+  color: #888;
+  text-align: center;
+}
+
+footer small {
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+/* 모바일 화면 */
+@media (max-width: 600px) {
+  body {
+    font-size: 14px;
   }
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
+  .app {
+    padding: 18px 14px;
   }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
+
+  .header {
+    padding: 8px 0 18px;
+  }
+
+  .header h1 {
+    margin-top: 10px;
+    font-size: 23px;
+  }
+
+  .header p {
+    font-size: 13px;
+  }
+
+  .results {
+    padding-top: 14px;
+  }
+
+  .search-input {
+    min-height: 44px;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+
+  .brand-filter {
+    gap: 6px;
+    margin-right: -2px;
+  }
+
+  .brand-filter-button {
+    min-height: 34px;
+    padding: 7px 11px;
+    font-size: 12px;
+  }
+
+  .lens-list {
+    gap: 8px;
+  }
+
+  .lens-card {
+    gap: 10px;
+    padding: 12px 10px;
+    border-radius: 9px;
+  }
+
+  .brand-name {
+    margin-bottom: 5px;
+    padding: 3px 6px;
+    font-size: 11px;
+  }
+
+  .lens-card h2 {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .lens-specification {
+    margin-top: 4px;
+    font-size: 12px;
+  }
+
+  .lens-price > strong {
+    font-size: 15px;
+  }
+
+  .admin-actions {
+    gap: 4px;
+  }
+
+  .admin-actions button {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
+  .admin-panel {
+    padding: 12px;
+  }
+
+  footer {
+    padding-top: 24px;
+  }
+}
+
+/* 아주 작은 휴대폰 */
+@media (max-width: 360px) {
+  .app {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .lens-card {
+    gap: 7px;
+    padding: 10px 8px;
+  }
+
+  .lens-card h2 {
+    font-size: 13px;
+  }
+
+  .lens-price > strong {
+    font-size: 14px;
   }
 }
