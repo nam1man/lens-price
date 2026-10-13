@@ -757,3 +757,38 @@
     padding: 5px 6px;
   }
 }
+/* ===== GLOSS mobile card design refinements ===== */
+:root {
+  --text-strong: #20212d;
+  --text-body: #454653;
+  --text-muted: #737582;
+  --surface: #ffffff;
+  --border: #e0e2e6;
+  --primary: #225c80;
+  --primary-bg: #edf3f7;
+  --primary-light: #8db7d2;
+  --secondary: #31835f;
+  --secondary-bg: #edf6f1;
+  --tag-bg: #f1f2f4;
+}
+
+.customer-section { background: #f7f8fa; }
+.result-count { text-align: left; }
+.lens-card { text-align: left; align-items: flex-start; }
+.card-left { text-align: left; }
+.brand-badge { color: #245c7e; background: #edf3f7; }
+.product-name { color: #20212d; }
+.meta-tag { background: #f0f1f3; color: #737582; }
+.meta-pack { background: #edf6f1; color: #31835f; }
+.price-main { color: #20212d; }
+.price-unit { color: #31835f; }
+@media (max-width: 480px) {
+  .lens-card { padding: 15px 14px; gap: 10px; }
+  .card-right { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+  .price-block { align-items: flex-start; }
+  .price-main { font-size: 18px; }
+  .price-unit { font-size: 12px; }
+  .brand-badge { margin-bottom: 6px; }
+  .product-name { font-size: 17px; margin-bottom: 8px; }
+  .card-meta { gap: 6px; }
+}
