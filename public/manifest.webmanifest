@@ -1,0 +1,20 @@
+
+{
+  "name": "GLOSS OPTICAL 콘택트렌즈 가격표",
+  "short_name": "GLOSS 렌즈",
+  "description": "콘택트렌즈 가격 조회",
+  "lang": "ko",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#252525",
+  "icons": [
+    {
+      "src": "/icons.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
