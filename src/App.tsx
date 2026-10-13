@@ -47,6 +47,33 @@ type SpectacleLens = {
   verification: string;
 };
 
+
+type LensOption = { manufacturer:string; name:string; index:string; coatings:{id:string;label:string;price:number}[]; extras:{id:string;label:string;add:number}[] };
+function LensVariant({variant,option}:{variant:SpectacleLens;option?:LensOption}) {
+  const [expanded,setExpanded]=useState(false);
+  const [coating,setCoating]=useState('base');
+  const [extras,setExtras]=useState<string[]>([]);
+  const coatingItem=option?.coatings.find(c=>c.id===coating) ?? option?.coatings[0];
+  const chosenExtras=(option?.extras ?? []).filter(x=>extras.includes(x.id));
+  const total=(coatingItem?.price ?? variant.price ?? 0)+chosenExtras.reduce((n,x)=>n+x.add,0);
+  return <div className="nikon-variant-wrap">
+    <button type="button" className="spectacle-variant nikon-variant-button" onClick={()=>setExpanded(v=>!v)} aria-expanded={expanded}>
+      <span>{variant.index} <small className="nikon-option-hint">{expanded?'접기':'옵션 선택 ▾'}</small></span>
+      <strong>{priceText(variant.price)}</strong>
+    </button>
+    {expanded && <div className="nikon-option-panel">
+      {option ? <>
+        <div className="nikon-option-label">코팅·가격 선택</div>
+        <div className="nikon-option-choices">{option.coatings.map(c=><label key={c.id} className={'nikon-option-choice '+(coating===c.id?'selected':'')}><input type="radio" name={'coat-'+variant.manufacturer+'-'+variant.name+'-'+variant.index} checked={coating===c.id} onChange={()=>setCoating(c.id)}/><span>{c.label}</span><b>{priceText(c.price)}</b></label>)}</div>
+        {option.manufacturer === '에실로' && <p className="nikon-option-warning">에실로 코팅·변색 추가금은 아직 원본 확인 전입니다. 기본 가격만 표시합니다.</p>}
+        {option.extras.length>0 && <><div className="nikon-option-label">추가 옵션</div><div className="nikon-option-choices">{option.extras.map(x=><label key={x.id} className="nikon-option-choice"><input type="checkbox" checked={extras.includes(x.id)} onChange={e=>setExtras(a=>e.target.checked?[...a,x.id]:a.filter(y=>y!==x.id))}/><span>{x.label}</span><b>+{priceText(x.add)}</b></label>)}</div></>}
+        <div className="nikon-option-total"><span>선택 옵션 포함 가격</span><strong>{coatingItem?.price == null && variant.price == null ? '가격 확인 필요' : priceText(total)}</strong></div>
+        <p className="nikon-option-warning">검토용 데이터입니다. 코팅·변색·착색·프리즘 조합 가능 여부와 추가금은 제조사 원본 가격표를 확인하세요. 확인되지 않은 옵션은 표시하지 않았습니다.</p>
+      </> : <p className="nikon-option-warning">옵션 가격 자료가 아직 확인되지 않았습니다. 기본 가격만 확인할 수 있습니다.</p>}
+    </div>}
+  </div>;
+}
+
 const lensCollection = collection(db, 'products', 'name', 'Lens');
 
 function priceText(val: number | null): string {
@@ -73,6 +100,7 @@ export default function App() {
   const [spectacleLenses, setSpectacleLenses] = useState<SpectacleLens[]>([]);
   const [spectacleSearch, setSpectacleSearch] = useState('');
   const [spectacleError, setSpectacleError] = useState('');
+  const [lensOptions, setLensOptions] = useState<LensOption[]>([]);
   const [search, setSearch] = useState('');
   const [brandFilter, setBrandFilter] = useState('전체');
   const [user, setUser] = useState<User | null>(null);
@@ -150,6 +178,10 @@ export default function App() {
       })
       .then((data: SpectacleLens[]) => setSpectacleLenses(data))
       .catch((err: unknown) => setSpectacleError(err instanceof Error ? err.message : '안경렌즈 데이터 로딩 실패'));
+  }, []);
+
+  useEffect(() => {
+    fetch('/lens_options.json').then(r=>{if(!r.ok)throw Error('옵션 데이터 없음');return r.json()}).then((data:LensOption[])=>setLensOptions(data)).catch(()=>setLensOptions([]));
   }, []);
 
   const spectacleGroups = useMemo(() => {
@@ -595,7 +627,7 @@ export default function App() {
       {lensTab === 'spectacle' && (
         <section className="spectacle-section">
           <input className="search-input spectacle-search" aria-label="안경렌즈 검색" placeholder="제조사, 제품군, 제품명, 굴절률 검색" value={spectacleSearch} onChange={(e) => setSpectacleSearch(e.target.value)} />
-          <p className="spectacle-note">에실로 가격표 · 원본 대조 전 검토용 데이터입니다. 실제 판매·견적 시 최신 가격표를 확인하세요.</p>
+          <p className="spectacle-note">에실로·니콘 가격표 · 원본 대조 전 검토용 데이터입니다. 실제 판매·견적 시 최신 가격표를 확인하세요.</p>
           {spectacleError && <p className="alert-error">{spectacleError}</p>}
           <p className="result-count">굴절률별 가격 {spectacleGroups.reduce((n,g) => n + g.families.reduce((m,f) => m + f.products.reduce((k,p) => k + p.variants.length,0),0),0)}개</p>
           <div className="spectacle-groups">
@@ -612,10 +644,7 @@ export default function App() {
                             <summary className="spectacle-product-title">{product.name}<span className="group-chevron">⌄</span></summary>
                             <div className="spectacle-variants"><div className="spectacle-variant spectacle-variant-head"><span>굴절률</span><span>권장소비자가격</span></div>
                               {product.variants.map((v,i) => (
-                                <div className="spectacle-variant" key={`${v.index}-${i}`}>
-                                  <span>{v.index}</span>
-                                  <strong>{v.price === null ? '가격 확인 필요' : priceText(v.price)}</strong>
-                                </div>
+                                <LensVariant key={`${v.index}-${i}`} variant={v} option={lensOptions.find(o=>o.manufacturer===v.manufacturer && o.name===v.name && o.index===v.index)} />
                               ))}
                             </div>
                           </details>
