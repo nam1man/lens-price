@@ -889,3 +889,19 @@ details[open] > summary .group-chevron { transform:rotate(180deg); }
 .spectacle-groups .spectacle-variant-head>span{font-weight:650}
 .spectacle-groups .spectacle-variant-head>span:last-child{text-align:right}
 @media(max-width:480px){.lens-type-tab{min-height:49px;font-size:14px;gap:6px}.lens-type-tab .tab-icon{font-size:20px}.spectacle-groups .brand-heading{padding:13px}.spectacle-groups .category-list{padding:8px}.spectacle-groups .category-heading{padding:12px;font-size:14px}.spectacle-groups .spectacle-product-title{padding:13px;font-size:14px}.spectacle-groups .spectacle-variants{padding:0 7px 7px}.spectacle-groups .spectacle-variant{grid-template-columns:minmax(0,1fr) minmax(115px,1fr);padding:9px 10px;font-size:14px}.spectacle-groups .spectacle-variant>strong{font-size:14px}.spectacle-total{font-size:11px}}
+/* Nikon index-click option selector */
+.nikon-variant-wrap{border-bottom:1px solid #e7edf4}.nikon-variant-wrap:last-child{border-bottom:0}
+.spectacle-groups .nikon-variant-button{width:100%;border:0;border-radius:0;background:#fff;text-align:left;cursor:pointer;font-family:inherit}
+.spectacle-groups .nikon-variant-button:hover{background:#f4f8fd}
+.nikon-option-hint{font-size:11px;color:#1775b9;margin-left:10px;font-weight:600}
+.nikon-option-panel{background:#f5f9fd;padding:13px 15px 16px;border-top:1px solid #dfeaf4}
+.nikon-option-label{font-weight:800;color:#24435f;font-size:13px;margin:8px 0}
+.nikon-option-choices{display:grid;gap:7px}
+.nikon-option-choice{display:flex;gap:9px;align-items:center;background:white;border:1px solid #dce6ef;border-radius:9px;padding:11px 10px;cursor:pointer;font-size:13px}
+.nikon-option-choice.selected{border-color:#2c83bd;background:#f0f8ff}
+.nikon-option-choice input{accent-color:#116cb2;flex-shrink:0}
+.nikon-option-choice span{flex:1;min-width:0}.nikon-option-choice b{white-space:nowrap;font-size:13px;color:#183d5f}
+.nikon-option-total{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid #d7e2ed;margin-top:13px;padding-top:13px;font-size:14px;font-weight:750}
+.nikon-option-total strong{font-size:19px;color:#075b9c;white-space:nowrap}
+.nikon-option-warning{font-size:11px;color:#7b6c50;line-height:1.55;margin:10px 0 0}
+@media(max-width:480px){.nikon-option-panel{padding:10px}.nikon-option-choice{font-size:12px;padding:9px 8px}.nikon-option-choice b{font-size:12px}.nikon-option-hint{display:inline-block;margin-left:4px}}
