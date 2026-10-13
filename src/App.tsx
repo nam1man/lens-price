@@ -65,7 +65,7 @@ function LensVariant({variant,option}:{variant:SpectacleLens;option?:LensOption}
       {option ? <>
         <div className="nikon-option-label">코팅·가격 선택</div>
         <div className="nikon-option-choices">{option.coatings.map(c=><label key={c.id} className={'nikon-option-choice '+(coating===c.id?'selected':'')}><input type="radio" name={'coat-'+variant.manufacturer+'-'+variant.name+'-'+variant.index} checked={coating===c.id} onChange={()=>setCoating(c.id)}/><span>{c.label}</span><b>{priceText(c.price)}</b></label>)}</div>
-        {option.manufacturer === '에실로' && <p className="nikon-option-warning">에실로 코팅·변색 추가금은 아직 원본 확인 전입니다. 기본 가격만 표시합니다.</p>}
+        {option.manufacturer === '에실로' && !['아이젠 K','스텔리스트'].includes(option.name) && <p className="nikon-option-warning">코팅·변색 옵션별 추가금은 확인되지 않아 기본 가격만 표시합니다.</p>}
         {option.extras.length>0 && <><div className="nikon-option-label">추가 옵션</div><div className="nikon-option-choices">{option.extras.map(x=><label key={x.id} className="nikon-option-choice"><input type="checkbox" checked={extras.includes(x.id)} onChange={e=>setExtras(a=>e.target.checked?[...a,x.id]:a.filter(y=>y!==x.id))}/><span>{x.label}</span><b>+{priceText(x.add)}</b></label>)}</div></>}
         <div className="nikon-option-total"><span>선택 옵션 포함 가격</span><strong>{coatingItem?.price == null && variant.price == null ? '가격 확인 필요' : priceText(total)}</strong></div>
         <p className="nikon-option-warning">검토용 데이터입니다. 코팅·변색·착색·프리즘 조합 가능 여부와 추가금은 제조사 원본 가격표를 확인하세요. 확인되지 않은 옵션은 표시하지 않았습니다.</p>
