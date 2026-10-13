@@ -102,6 +102,8 @@ export default function App() {
   const [spectacleSearch, setSpectacleSearch] = useState('');
   const [spectacleError, setSpectacleError] = useState('');
   const [lensOptions, setLensOptions] = useState<LensOption[]>([]);
+  const [optionLoadError, setOptionLoadError] = useState('');
+  const [optionLoaded, setOptionLoaded] = useState(false);
   const [search, setSearch] = useState('');
   const [brandFilter, setBrandFilter] = useState('전체');
   const [user, setUser] = useState<User | null>(null);
@@ -182,7 +184,15 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    fetch('/lens_options.json?v=essilor-20261013-full', {cache:'no-store'}).then(r=>{if(!r.ok)throw Error('옵션 데이터 없음');return r.json()}).then((data:LensOption[])=>setLensOptions(data)).catch(()=>setLensOptions([]));
+    fetch('/lens_options.json?v=gloss-options-diagnostic-20261013b', {cache:'no-store'})
+      .then(r => { if (!r.ok) throw new Error(`옵션 파일 HTTP ${r.status}`); return r.json(); })
+      .then((data: LensOption[]) => {
+        if (!Array.isArray(data)) throw new Error('옵션 파일이 배열 형식이 아닙니다.');
+        setLensOptions(data);
+        setOptionLoaded(true);
+        setOptionLoadError('');
+      })
+      .catch(err => { setLensOptions([]); setOptionLoaded(false); setOptionLoadError(String(err)); });
   }, []);
 
   const spectacleGroups = useMemo(() => {
@@ -630,6 +640,7 @@ export default function App() {
           <input className="search-input spectacle-search" aria-label="안경렌즈 검색" placeholder="제조사, 제품군, 제품명, 굴절률 검색" value={spectacleSearch} onChange={(e) => setSpectacleSearch(e.target.value)} />
           <p className="spectacle-note">에실로·니콘 가격표 · 원본 대조 전 검토용 데이터입니다. 실제 판매·견적 시 최신 가격표를 확인하세요.</p>
           {spectacleError && <p className="alert-error">{spectacleError}</p>}
+           <p className="spectacle-note">옵션 데이터: {optionLoadError ? `불러오기 실패 (${optionLoadError})` : optionLoaded ? `${lensOptions.length}개 로딩 완료` : '불러오는 중'}</p>
           <p className="result-count">굴절률별 가격 {spectacleGroups.reduce((n,g) => n + g.families.reduce((m,f) => m + f.products.reduce((k,p) => k + p.variants.length,0),0),0)}개</p>
           <div className="spectacle-groups">
             {spectacleGroups.map((group) => (
@@ -645,7 +656,7 @@ export default function App() {
                             <summary className="spectacle-product-title">{product.name}<span className="group-chevron">⌄</span></summary>
                             <div className="spectacle-variants"><div className="spectacle-variant spectacle-variant-head"><span>굴절률</span><span>권장소비자가격</span></div>
                               {product.variants.map((v,i) => (
-                                <LensVariant key={`${v.index}-${i}`} variant={v} option={lensOptions.find(o=>o.manufacturer===v.manufacturer && o.name===v.name && o.index===v.index)} />
+                                <LensVariant key={`${v.index}-${i}`} variant={v} option={lensOptions.find(o=>o.manufacturer.trim()===v.manufacturer.trim() && o.name.trim()===v.name.trim() && String(o.index).trim()===String(v.index).trim())} />
                               ))}
                             </div>
                           </details>
