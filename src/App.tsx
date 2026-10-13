@@ -588,8 +588,8 @@ export default function App() {
       </div>
 
       <nav className="lens-type-tabs" aria-label="렌즈 가격표 종류">
-        <button type="button" className={lensTab === 'contact' ? 'lens-type-tab active' : 'lens-type-tab'} onClick={() => setLensTab('contact')}>콘택트렌즈</button>
-        <button type="button" className={lensTab === 'spectacle' ? 'lens-type-tab active' : 'lens-type-tab'} onClick={() => setLensTab('spectacle')}>안경렌즈</button>
+        <button type="button" className={lensTab === 'contact' ? 'lens-type-tab active' : 'lens-type-tab'} onClick={() => setLensTab('contact')}><span className="tab-icon" aria-hidden="true">◉</span><span>콘택트렌즈</span></button>
+        <button type="button" className={lensTab === 'spectacle' ? 'lens-type-tab active' : 'lens-type-tab'} onClick={() => setLensTab('spectacle')}><span className="tab-icon" aria-hidden="true">⌁</span><span>안경렌즈</span></button>
       </nav>
 
       {lensTab === 'spectacle' && (
@@ -601,7 +601,7 @@ export default function App() {
           <div className="spectacle-groups">
             {spectacleGroups.map((group) => (
               <details className="brand-group" key={group.manufacturer} open={spectacleSearch.trim() ? true : undefined}>
-                <summary className="group-heading brand-heading">{group.manufacturer}<span className="group-chevron">⌄</span></summary>
+                <summary className="group-heading brand-heading"><span className="spectacle-brand-icon" aria-hidden="true">◉</span><span className="group-heading-text">{group.manufacturer}</span><span className="spectacle-total">{group.families.reduce((n,f)=>n+f.products.reduce((m,p)=>m+p.variants.length,0),0)}개 가격</span><span className="group-chevron">⌄</span></summary>
                 <div className="category-list">
                   {group.families.map((family) => (
                     <details className="category-group" key={family.family} open={spectacleSearch.trim() ? true : undefined}>
@@ -610,10 +610,10 @@ export default function App() {
                         {family.products.map((product) => (
                           <details className="spectacle-product" key={product.name} open={spectacleSearch.trim() ? true : undefined}>
                             <summary className="spectacle-product-title">{product.name}<span className="group-chevron">⌄</span></summary>
-                            <div className="spectacle-variants">
+                            <div className="spectacle-variants"><div className="spectacle-variant spectacle-variant-head"><span>굴절률</span><span>권장소비자가격</span></div>
                               {product.variants.map((v,i) => (
                                 <div className="spectacle-variant" key={`${v.index}-${i}`}>
-                                  <span>굴절률 {v.index}</span>
+                                  <span>{v.index}</span>
                                   <strong>{v.price === null ? '가격 확인 필요' : priceText(v.price)}</strong>
                                 </div>
                               ))}
