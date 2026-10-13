@@ -1,5 +1,4 @@
-
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   collection,
   onSnapshot,
@@ -15,6 +14,12 @@ import {
   type User,
 } from 'firebase/auth';
 import { db, auth } from './firebase';
+import {
+  parseCsv,
+  findDuplicates,
+  type CsvRow,
+  type DuplicateInfo,
+} from './csvImport';
 import './App.css';
 
 type Lens = {
@@ -22,15 +27,39 @@ type Lens = {
   brand: string;
   productName: string;
   specification: string;
+  lensType: string;
+  wearType: string;
+  packQuantity: string;
+  displayPrice: number | null;
+  oldPrice: number | null;
+  unitPrice: number | null;
   price: number;
 };
 
 const lensCollection = collection(db, 'products', 'name', 'Lens');
 
+function priceText(val: number | null): string {
+  if (val === null || val === undefined) return '미입력';
+  return `${val.toLocaleString('ko-KR')}원`;
+}
+
+function priceToFirestore(val: string): number | null {
+  if (val.trim() === '') return null;
+  const num = Number(val.replace(/,/g, ''));
+  if (!Number.isFinite(num) || num < 0) return null;
+  return num;
+}
+
+function firestoreToPrice(val: unknown): number | null {
+  if (val === null || val === undefined || val === '') return null;
+  const num = Number(val);
+  return Number.isFinite(num) ? num : null;
+}
+
 export default function App() {
   const [lenses, setLenses] = useState<Lens[]>([]);
   const [search, setSearch] = useState('');
-  const [selectedBrand, setSelectedBrand] = useState('전체');
+  const [brandFilter, setBrandFilter] = useState('전체');
   const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,13 +68,29 @@ export default function App() {
   const [brand, setBrand] = useState('');
   const [productName, setProductName] = useState('');
   const [specification, setSpecification] = useState('');
-  const [price, setPrice] = useState('');
+  const [lensType, setLensType] = useState('');
+  const [wearType, setWearType] = useState('');
+  const [packQuantity, setPackQuantity] = useState('');
+  const [displayPrice, setDisplayPrice] = useState('');
+  const [oldPrice, setOldPrice] = useState('');
+  const [unitPrice, setUnitPrice] = useState('');
   const [status, setStatus] = useState('Firebase 연결 확인 중...');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  // CSV upload state
+  const [csvRows, setCsvRows] = useState<CsvRow[]>([]);
+  const [csvFileName, setCsvFileName] = useState('');
+  const [csvDuplicates, setCsvDuplicates] = useState<DuplicateInfo[]>([]);
+  const [csvUploading, setCsvUploading] = useState(false);
+  const [csvError, setCsvError] = useState('');
+  const [csvSuccess, setCsvSuccess] = useState('');
+  const [replaceMode, setReplaceMode] = useState(false);
+  const [replacing, setReplacing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, setUser);
-
     const unsubscribeData = onSnapshot(
       lensCollection,
       (snapshot) => {
@@ -57,6 +102,12 @@ export default function App() {
               brand: String(data.brand ?? ''),
               productName: String(data.productName ?? ''),
               specification: String(data.specification ?? ''),
+              lensType: String(data.lensType ?? ''),
+              wearType: String(data.wearType ?? ''),
+              packQuantity: String(data.packQuantity ?? ''),
+              displayPrice: firestoreToPrice(data.displayPrice),
+              oldPrice: firestoreToPrice(data.oldPrice),
+              unitPrice: firestoreToPrice(data.unitPrice),
               price: Number(data.price ?? 0),
             };
           })
@@ -76,32 +127,15 @@ export default function App() {
     };
   }, []);
 
-  const brands = [
-    '전체',
-    ...Array.from(
-      new Set(lenses.map((lens) => lens.brand.trim()).filter(Boolean))
-    ).sort((a, b) => a.localeCompare(b, 'ko')),
-  ];
-
-  function resetForm() {
-    setEditingId(null);
-    setBrand('');
-    setProductName('');
-    setSpecification('');
-    setPrice('');
-  }
-
-  function editLens(lens: Lens) {
-    setEditingId(lens.id);
-    setBrand(lens.brand);
-    setProductName(lens.productName);
-    setSpecification(lens.specification);
-    setPrice(String(lens.price));
-    setAdminOpen(true);
+  function clearMessages() {
+    setError('');
+    setSuccess('');
+    setCsvError('');
+    setCsvSuccess('');
   }
 
   async function login() {
-    setError('');
+    clearMessages();
     try {
       await signInWithEmailAndPassword(auth, email, password);
       setPassword('');
@@ -111,33 +145,67 @@ export default function App() {
     }
   }
 
+  function resetForm() {
+    setEditingId(null);
+    setBrand('');
+    setProductName('');
+    setSpecification('');
+    setLensType('');
+    setWearType('');
+    setPackQuantity('');
+    setDisplayPrice('');
+    setOldPrice('');
+    setUnitPrice('');
+  }
+
+  function editLens(lens: Lens) {
+    setEditingId(lens.id);
+    setBrand(lens.brand);
+    setProductName(lens.productName);
+    setSpecification(lens.specification);
+    setLensType(lens.lensType);
+    setWearType(lens.wearType);
+    setPackQuantity(lens.packQuantity);
+    setDisplayPrice(lens.displayPrice !== null ? String(lens.displayPrice) : '');
+    setOldPrice(lens.oldPrice !== null ? String(lens.oldPrice) : '');
+    setUnitPrice(lens.unitPrice !== null ? String(lens.unitPrice) : '');
+    setAdminOpen(true);
+  }
+
   async function saveLens() {
-    if (!brand.trim() || !productName.trim() || !price.trim()) {
-      setError('브랜드, 제품명, 가격을 입력해 주세요.');
+    if (!brand.trim() || !productName.trim()) {
+      setError('브랜드와 제품명을 입력해 주세요.');
       return;
     }
 
-    const numericPrice = Number(price.replace(/,/g, ''));
+    const dispVal = priceToFirestore(displayPrice);
+    const oldVal = priceToFirestore(oldPrice);
+    const unitVal = priceToFirestore(unitPrice);
 
-    if (!Number.isFinite(numericPrice) || numericPrice < 0) {
-      setError('올바른 가격을 입력해 주세요.');
-      return;
-    }
+    // Backward-compatible: price field = displayPrice or unitPrice or 0
+    const compatPrice = dispVal ?? unitVal ?? 0;
 
     const data = {
       brand: brand.trim(),
       productName: productName.trim(),
       specification: specification.trim(),
-      price: numericPrice,
+      lensType: lensType.trim(),
+      wearType: wearType.trim(),
+      packQuantity: packQuantity.trim(),
+      displayPrice: dispVal,
+      oldPrice: oldVal,
+      unitPrice: unitVal,
+      price: compatPrice,
     };
 
-    setError('');
-
+    clearMessages();
     try {
       if (editingId) {
         await updateDoc(doc(lensCollection, editingId), data);
+        setSuccess('상품이 수정되었습니다.');
       } else {
         await addDoc(lensCollection, data);
+        setSuccess('상품이 추가되었습니다.');
       }
       resetForm();
     } catch (err) {
@@ -147,87 +215,368 @@ export default function App() {
 
   async function removeLens(id: string) {
     if (!window.confirm('이 상품을 삭제할까요?')) return;
-
-    setError('');
-
+    clearMessages();
     try {
       await deleteDoc(doc(lensCollection, id));
+      setSuccess('상품이 삭제되었습니다.');
     } catch (err) {
       setError(err instanceof Error ? err.message : '삭제 실패');
     }
   }
 
-  const keyword = search.trim().toLowerCase();
+  // CSV file handling
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    clearMessages();
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  const filteredLenses = lenses.filter((lens) => {
-    const matchesBrand =
-      selectedBrand === '전체' || lens.brand.trim() === selectedBrand;
+    setCsvFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = String(ev.target?.result ?? '');
+      try {
+        const result = parseCsv(text);
+        if (result.rows.length === 0) {
+          setCsvError('CSV 파일에서 유효한 데이터를 찾을 수 없습니다.');
+          setCsvRows([]);
+          setCsvDuplicates([]);
+          return;
+        }
+        const dups = findDuplicates(
+          result.rows,
+          lenses.map((l) => ({
+            id: l.id,
+            brand: l.brand,
+            productName: l.productName,
+            packQuantity: l.packQuantity,
+          }))
+        );
+        setCsvRows(result.rows);
+        setCsvDuplicates(dups);
+        setCsvError('');
+      } catch {
+        setCsvError('CSV 파일을 읽는 중 오류가 발생했습니다.');
+        setCsvRows([]);
+        setCsvDuplicates([]);
+      }
+    };
+    reader.onerror = () => {
+      setCsvError('파일을 읽을 수 없습니다.');
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
 
-    const matchesSearch =
-      !keyword ||
-      lens.brand.toLowerCase().includes(keyword) ||
-      lens.productName.toLowerCase().includes(keyword) ||
-      lens.specification.toLowerCase().includes(keyword);
+  function clearCsv() {
+    setCsvRows([]);
+    setCsvFileName('');
+    setCsvDuplicates([]);
+    setCsvError('');
+    setCsvSuccess('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }
 
-    return matchesBrand && matchesSearch;
-  });
+  function rowToData(row: CsvRow) {
+    const dispVal = row.displayPrice;
+    const unitVal = row.unitPrice;
+    const compatPrice = dispVal ?? unitVal ?? 0;
+    return {
+      brand: row.brand.trim(),
+      productName: row.productName.trim(),
+      specification: row.packQuantity.trim(),
+      lensType: row.lensType.trim(),
+      wearType: row.wearType.trim(),
+      packQuantity: row.packQuantity.trim(),
+      displayPrice: dispVal,
+      oldPrice: row.oldPrice,
+      unitPrice: unitVal,
+      price: compatPrice,
+    };
+  }
+
+  async function uploadCsv() {
+    if (csvRows.length === 0) return;
+    if (csvDuplicates.length > 0) {
+      setCsvError(
+        `중복 항목 ${csvDuplicates.length}개가 있습니다. 중복 항목을 CSV에서 삭제하거나 수정한 후 다시 업로드해 주세요.`
+      );
+      return;
+    }
+
+    setCsvUploading(true);
+    clearMessages();
+    let added = 0;
+    let failed = 0;
+
+    try {
+      for (const row of csvRows) {
+        try {
+          await addDoc(lensCollection, rowToData(row));
+          added++;
+        } catch {
+          failed++;
+        }
+      }
+
+      if (failed === 0) {
+        setCsvSuccess(`${added}개 상품이 등록되었습니다.`);
+        clearCsv();
+      } else {
+        setCsvError(`${added}개 등록 성공, ${failed}개 실패.`);
+      }
+    } catch {
+      setCsvError('업로드 중 오류가 발생했습니다.');
+    } finally {
+      setCsvUploading(false);
+    }
+  }
+
+  async function loadBundledCsv(): Promise<CsvRow[]> {
+    clearMessages();
+    setCsvFileName('lens_prices.csv (첨부 파일)');
+    try {
+      const resp = await fetch('/lens_prices.csv');
+      const text = await resp.text();
+      const result = parseCsv(text);
+      if (result.rows.length === 0) {
+        setCsvError('CSV 파일에서 유효한 데이터를 찾을 수 없습니다.');
+        setCsvRows([]);
+        setCsvDuplicates([]);
+        return [];
+      }
+      const dups = findDuplicates(
+        result.rows,
+        lenses.map((l) => ({
+          id: l.id,
+          brand: l.brand,
+          productName: l.productName,
+          packQuantity: l.packQuantity,
+        }))
+      );
+      setCsvRows(result.rows);
+      setCsvDuplicates(dups);
+      setCsvError('');
+      return result.rows;
+    } catch {
+      setCsvError('파일을 불러올 수 없습니다.');
+      setCsvRows([]);
+      setCsvDuplicates([]);
+      return [];
+    }
+  }
+
+  async function quickReplaceAll() {
+    const confirmed = window.confirm(
+      `기존 상품 ${lenses.length}개를 모두 삭제하고 첨부된 CSV 파일(${161}개)로 교체합니다.\n계속하시겠습니까?`
+    );
+    if (!confirmed) return;
+
+    setReplacing(true);
+    clearMessages();
+
+    try {
+      const resp = await fetch('/lens_prices.csv');
+      const text = await resp.text();
+      const result = parseCsv(text);
+      const newRows = result.rows;
+
+      if (newRows.length === 0) {
+        setCsvError('CSV 파일에서 유효한 데이터를 찾을 수 없습니다.');
+        return;
+      }
+
+      // Delete all existing products
+      for (const lens of lenses) {
+        try {
+          await deleteDoc(doc(lensCollection, lens.id));
+        } catch {
+          // continue even if some deletes fail
+        }
+      }
+
+      // Add all new products
+      let added = 0;
+      let failed = 0;
+      for (const row of newRows) {
+        try {
+          await addDoc(lensCollection, rowToData(row));
+          added++;
+        } catch {
+          failed++;
+        }
+      }
+
+      if (failed === 0) {
+        setCsvSuccess(
+          `기존 ${lenses.length}개 삭제 후 ${added}개 상품이 등록되었습니다.`
+        );
+      } else {
+        setCsvError(`${added}개 등록 성공, ${failed}개 실패.`);
+      }
+    } catch {
+      setCsvError('데이터 교체 중 오류가 발생했습니다.');
+    } finally {
+      setReplacing(false);
+    }
+  }
+
+  async function replaceAllData() {
+    if (csvRows.length === 0) return;
+    if (csvDuplicates.length > 0 && !replaceMode) {
+      setCsvError(
+        `중복 항목 ${csvDuplicates.length}개가 있습니다. 중복 항목을 CSV에서 삭제하거나 수정한 후 다시 시도해 주세요.`
+      );
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `기존 상품 ${lenses.length}개를 모두 삭제하고 CSV ${csvRows.length}개로 교체합니다.\n계속하시겠습니까?`
+    );
+    if (!confirmed) return;
+
+    setReplacing(true);
+    clearMessages();
+
+    try {
+      // Delete all existing products
+      for (const lens of lenses) {
+        try {
+          await deleteDoc(doc(lensCollection, lens.id));
+        } catch {
+          // continue even if some deletes fail
+        }
+      }
+
+      // Add all new products
+      let added = 0;
+      let failed = 0;
+      for (const row of csvRows) {
+        try {
+          await addDoc(lensCollection, rowToData(row));
+          added++;
+        } catch {
+          failed++;
+        }
+      }
+
+      if (failed === 0) {
+        setCsvSuccess(
+          `기존 ${lenses.length}개 삭제 후 ${added}개 상품이 등록되었습니다.`
+        );
+        clearCsv();
+        setReplaceMode(false);
+      } else {
+        setCsvError(`${added}개 등록 성공, ${failed}개 실패.`);
+      }
+    } catch {
+      setCsvError('데이터 교체 중 오류가 발생했습니다.');
+    } finally {
+      setReplacing(false);
+    }
+  }
+
+  // Brand list for filter
+  const brands = useMemo(() => {
+    const set = new Set<string>();
+    lenses.forEach((l) => {
+      if (l.brand.trim()) set.add(l.brand.trim());
+    });
+    return ['전체', ...Array.from(set).sort((a, b) => a.localeCompare(b, 'ko-KR'))];
+  }, [lenses]);
+
+  const filteredLenses = useMemo(() => {
+    const keyword = search.trim().toLowerCase();
+    return lenses
+      .filter((lens) => {
+        if (brandFilter !== '전체' && lens.brand.trim() !== brandFilter) return false;
+        if (!keyword) return true;
+        return (
+          lens.brand.toLowerCase().includes(keyword) ||
+          lens.productName.toLowerCase().includes(keyword) ||
+          lens.specification.toLowerCase().includes(keyword) ||
+          lens.lensType.toLowerCase().includes(keyword) ||
+          lens.wearType.toLowerCase().includes(keyword)
+        );
+      })
+      .sort((a, b) => {
+        const brandCmp = a.brand.localeCompare(b.brand, 'ko-KR');
+        if (brandCmp !== 0) return brandCmp;
+        return a.productName.localeCompare(b.productName, 'ko-KR');
+      });
+  }, [lenses, search, brandFilter]);
+
+  const nonDupCount = csvRows.length - csvDuplicates.length;
 
   return (
-    <main className="app">
+    <div className="app">
       <header className="header">
         <div className="logo">GLOSS OPTICAL</div>
         <h1>콘택트렌즈 가격표</h1>
-        <p>브랜드와 제품명을 확인해 보세요.</p>
+        <p className="subtitle">브랜드와 제품명을 확인해 보세요.</p>
       </header>
 
-      <section className="results">
-        <p className="connection-status">{status}</p>
-        {error && <p role="alert" className="error-message">오류: {error}</p>}
+      <div className="status-bar">
+        <span className="status-text">{status}</span>
+        {error && <span className="alert-error" role="alert">{error}</span>}
+        {success && <span className="alert-success">{success}</span>}
+      </div>
 
-        <input
-          className="search-input"
-          placeholder="브랜드 또는 제품명 검색"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-
-        <div className="brand-filter" aria-label="브랜드 선택">
-          {brands.map((item) => (
-            <button
-              key={item}
-              type="button"
-              className={`brand-filter-button ${
-                selectedBrand === item ? 'active' : ''
-              }`}
-              aria-pressed={selectedBrand === item}
-              onClick={() => setSelectedBrand(item)}
-            >
-              {item}
-            </button>
-          ))}
+      {/* Customer view: search + brand filter + product list */}
+      <section className="customer-section">
+        <div className="search-bar">
+          <input
+            className="search-input"
+            placeholder="브랜드, 제품명, 규격 검색"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <select
+            className="brand-filter"
+            value={brandFilter}
+            onChange={(e) => setBrandFilter(e.target.value)}
+          >
+            {brands.map((b) => (
+              <option key={b} value={b}>{b}</option>
+            ))}
+          </select>
         </div>
 
-        <p className="result-count">
-          검색 결과 <strong>{filteredLenses.length}</strong>개
-        </p>
+        <p className="result-count">검색 결과 {filteredLenses.length}개</p>
 
-        <div className="lens-list">
+        <div className="card-list">
           {filteredLenses.map((lens) => (
             <article className="lens-card" key={lens.id}>
-              <div className="lens-info">
-                <span className="brand-name">{lens.brand}</span>
-                <h2>{lens.productName}</h2>
-                {lens.specification && (
-                  <p className="lens-specification">{lens.specification}</p>
-                )}
+              <div className="card-left">
+                <span className="brand-badge">{lens.brand}</span>
+                <h2 className="product-name">{lens.productName}</h2>
+                <div className="card-meta">
+                  {lens.lensType && <span className="meta-tag">{lens.lensType}</span>}
+                  {lens.wearType && <span className="meta-tag">{lens.wearType}</span>}
+                  {lens.packQuantity && (
+                    <span className="meta-tag meta-pack">{lens.packQuantity}</span>
+                  )}
+                </div>
               </div>
-
-              <div className="lens-price">
-                <strong>{lens.price.toLocaleString('ko-KR')}원</strong>
+              <div className="card-right">
+                <div className="price-block">
+                  <span className="price-main">{priceText(lens.displayPrice)}</span>
+                  {lens.oldPrice !== null && (
+                    <span className="price-old">
+                      이전 {priceText(lens.oldPrice)}
+                    </span>
+                  )}
+                  {lens.unitPrice !== null && (
+                    <span className="price-unit">
+                      1개당 {priceText(lens.unitPrice)}
+                    </span>
+                  )}
+                  {lens.displayPrice === null && lens.unitPrice === null && lens.price > 0 && (
+                    <span className="price-main">{lens.price.toLocaleString('ko-KR')}원</span>
+                  )}
+                </div>
                 {user && (
-                  <div className="admin-actions">
-                    <button onClick={() => editLens(lens)}>수정</button>
-                    <button onClick={() => removeLens(lens.id)}>삭제</button>
+                  <div className="card-actions">
+                    <button className="btn-sm btn-edit" onClick={() => editLens(lens)}>수정</button>
+                    <button className="btn-sm btn-del" onClick={() => removeLens(lens.id)}>삭제</button>
                   </div>
                 )}
               </div>
@@ -236,76 +585,300 @@ export default function App() {
         </div>
 
         {filteredLenses.length === 0 && (
-          <p className="empty-results">검색 결과가 없습니다.</p>
+          <p className="no-results">검색 결과가 없습니다.</p>
         )}
+      </section>
 
-        <hr />
-
-        <button onClick={() => setAdminOpen(!adminOpen)}>
+      {/* Admin section */}
+      <div className="admin-toggle">
+        <button className="btn-toggle" onClick={() => setAdminOpen(!adminOpen)}>
           {adminOpen ? '관리자 메뉴 닫기' : '관리자'}
         </button>
+      </div>
 
-        {adminOpen && (
-          <section className="admin-panel">
-            {!user ? (
-              <div>
-                <h2>관리자 로그인</h2>
+      {adminOpen && (
+        <section className="admin-section">
+          {!user ? (
+            <div className="admin-login">
+              <h2>관리자 로그인</h2>
+              <div className="form-row">
                 <input
                   type="email"
+                  className="form-input"
                   placeholder="관리자 이메일"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
+              </div>
+              <div className="form-row">
                 <input
                   type="password"
+                  className="form-input"
                   placeholder="비밀번호"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') login(); }}
                 />
-                <button onClick={login}>로그인</button>
               </div>
-            ) : (
-              <div>
+              <button className="btn-primary" onClick={login}>로그인</button>
+            </div>
+          ) : (
+            <div className="admin-panel">
+              <div className="admin-header">
                 <h2>상품 관리</h2>
-                <p>로그인: {user.email}</p>
-
-                <input
-                  placeholder="브랜드"
-                  value={brand}
-                  onChange={(e) => setBrand(e.target.value)}
-                />
-                <input
-                  placeholder="제품명"
-                  value={productName}
-                  onChange={(e) => setProductName(e.target.value)}
-                />
-                <input
-                  placeholder="규격 (예: 30개입)"
-                  value={specification}
-                  onChange={(e) => setSpecification(e.target.value)}
-                />
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="가격"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                />
-
-                <button onClick={saveLens}>
-                  {editingId ? '수정 저장' : '상품 추가'}
-                </button>
-                <button onClick={resetForm}>입력 초기화</button>
-                <button onClick={() => signOut(auth)}>로그아웃</button>
+                <span className="admin-email">{user.email}</span>
               </div>
-            )}
-          </section>
-        )}
-      </section>
 
-      <footer>
+              {/* CSV Upload */}
+              <div className="csv-section">
+                <h3>CSV 일괄 등록</h3>
+                <p className="csv-help">
+                  엑셀에서 CSV 파일로 저장한 후 아래 버튼으로 선택하세요.
+                  업로드 전에 미리 확인할 수 있습니다.
+                </p>
+
+                <div className="quick-replace-section">
+                  <button
+                    className="btn-primary btn-danger btn-large"
+                    onClick={quickReplaceAll}
+                    disabled={replacing}
+                  >
+                    {replacing ? '교체 중...' : '첨부 파일로 전체 교체 (기존 데이터 삭제 + 새 등록)'}
+                  </button>
+                  <p className="quick-replace-hint">
+                    이 버튼을 누르면 기존 데이터를 모두 삭제하고 첨부된 가격표 161개로 새로 교체합니다.
+                  </p>
+                </div>
+
+                <div className="csv-upload-row">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".csv,text/csv"
+                    onChange={handleFileSelect}
+                    className="file-input"
+                  />
+                  <button className="btn-secondary btn-bundled" onClick={() => loadBundledCsv()}>
+                    첨부 파일 미리보기
+                  </button>
+                  {csvFileName && (
+                    <button className="btn-sm btn-cancel" onClick={clearCsv}>취소</button>
+                  )}
+                </div>
+
+                <div className="csv-mode-row">
+                  <label className="csv-mode-label">
+                    <input
+                      type="checkbox"
+                      checked={replaceMode}
+                      onChange={(e) => setReplaceMode(e.target.checked)}
+                    />
+                    기존 데이터 삭제 후 새로 교체
+                  </label>
+                </div>
+
+                {csvError && <p className="alert-error" role="alert">{csvError}</p>}
+                {csvSuccess && <p className="alert-success">{csvSuccess}</p>}
+
+                {csvRows.length > 0 && (
+                  <div className="csv-preview">
+                    <div className="csv-preview-header">
+                      <strong>미리보기: {csvRows.length}개 항목</strong>
+                      {csvDuplicates.length > 0 && (
+                        <span className="dup-warning">
+                          중복 {csvDuplicates.length}개 (업로드 불가)
+                        </span>
+                      )}
+                      {csvDuplicates.length === 0 && (
+                        <span className="dup-ok">중복 없음 — 등록 가능 {nonDupCount}개</span>
+                      )}
+                    </div>
+
+                    {csvDuplicates.length > 0 && (
+                      <div className="dup-list">
+                        <p className="dup-title">중복 항목 (기존 상품과 겹침):</p>
+                        <ul>
+                          {csvDuplicates.map((d) => (
+                            <li key={d.index}>
+                              {d.row.brand} — {d.row.productName} ({d.row.packQuantity})
+                              <span className="dup-existing">
+                                (기존: {d.existingProductName})
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="dup-hint">
+                          중복 항목을 CSV 파일에서 삭제하거나 제품명을 변경한 후 다시 선택해 주세요.
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="csv-table-wrap">
+                      <table className="csv-table">
+                        <thead>
+                          <tr>
+                            <th>브랜드</th>
+                            <th>렌즈구분</th>
+                            <th>제품명</th>
+                            <th>착용유형</th>
+                            <th>포장수량</th>
+                            <th>권장/표시가격</th>
+                            <th>이전 가격</th>
+                            <th>1개당 가격</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {csvRows.map((row, i) => {
+                            const isDup = csvDuplicates.some((d) => d.index === i);
+                            return (
+                              <tr key={i} className={isDup ? 'row-dup' : ''}>
+                                <td>{row.brand}</td>
+                                <td>{row.lensType}</td>
+                                <td>{row.productName}</td>
+                                <td>{row.wearType}</td>
+                                <td>{row.packQuantity}</td>
+                                <td>{priceText(row.displayPrice)}</td>
+                                <td>{priceText(row.oldPrice)}</td>
+                                <td>{priceText(row.unitPrice)}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {replaceMode ? (
+                      <button
+                        className="btn-primary btn-danger"
+                        onClick={replaceAllData}
+                        disabled={replacing || csvDuplicates.length > 0}
+                      >
+                        {replacing ? '교체 중...' : `기존 데이터 삭제 후 ${nonDupCount}개 등록`}
+                      </button>
+                    ) : (
+                      <button
+                        className="btn-primary"
+                        onClick={uploadCsv}
+                        disabled={csvUploading || csvDuplicates.length > 0}
+                      >
+                        {csvUploading ? '업로드 중...' : `${nonDupCount}개 등록`}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <hr className="divider" />
+
+              {/* Single product edit form */}
+              <div className="edit-section">
+                <h3>{editingId ? '상품 수정' : '상품 개별 추가'}</h3>
+                <div className="form-grid">
+                  <div className="form-row">
+                    <label className="form-label">브랜드</label>
+                    <input
+                      className="form-input"
+                      placeholder="예: 클라렌"
+                      value={brand}
+                      onChange={(e) => setBrand(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">렌즈 구분</label>
+                    <input
+                      className="form-input"
+                      placeholder="예: 투명, 컬러"
+                      value={lensType}
+                      onChange={(e) => setLensType(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">제품명</label>
+                    <input
+                      className="form-input"
+                      placeholder="제품명"
+                      value={productName}
+                      onChange={(e) => setProductName(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">착용 유형</label>
+                    <input
+                      className="form-input"
+                      placeholder="예: 1일, 1개월"
+                      value={wearType}
+                      onChange={(e) => setWearType(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">포장수량</label>
+                    <input
+                      className="form-input"
+                      placeholder="예: 30개입"
+                      value={packQuantity}
+                      onChange={(e) => setPackQuantity(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">규격 (기존)</label>
+                    <input
+                      className="form-input"
+                      placeholder="예: 30개입"
+                      value={specification}
+                      onChange={(e) => setSpecification(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">권장/표시가격</label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="비어 있으면 미입력"
+                      value={displayPrice}
+                      onChange={(e) => setDisplayPrice(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">이전 가격</label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="비어 있으면 미입력"
+                      value={oldPrice}
+                      onChange={(e) => setOldPrice(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">1개당 가격</label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="비어 있으면 미입력"
+                      value={unitPrice}
+                      onChange={(e) => setUnitPrice(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-actions">
+                  <button className="btn-primary" onClick={saveLens}>
+                    {editingId ? '수정 저장' : '상품 추가'}
+                  </button>
+                  <button className="btn-secondary" onClick={resetForm}>입력 초기화</button>
+                  <button className="btn-secondary" onClick={() => signOut(auth)}>로그아웃</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      <footer className="footer">
         <small>GLOSS OPTICAL · CONTACT LENS PRICE</small>
       </footer>
-    </main>
+    </div>
   );
 }
