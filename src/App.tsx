@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import {
   collection,
@@ -29,6 +30,7 @@ const lensCollection = collection(db, 'products', 'name', 'Lens');
 export default function App() {
   const [lenses, setLenses] = useState<Lens[]>([]);
   const [search, setSearch] = useState('');
+  const [selectedBrand, setSelectedBrand] = useState('전체');
   const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -43,6 +45,7 @@ export default function App() {
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, setUser);
+
     const unsubscribeData = onSnapshot(
       lensCollection,
       (snapshot) => {
@@ -73,16 +76,12 @@ export default function App() {
     };
   }, []);
 
-  async function login() {
-    setError('');
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      setPassword('');
-      setAdminOpen(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '로그인 실패');
-    }
-  }
+  const brands = [
+    '전체',
+    ...Array.from(
+      new Set(lenses.map((lens) => lens.brand.trim()).filter(Boolean))
+    ).sort((a, b) => a.localeCompare(b, 'ko')),
+  ];
 
   function resetForm() {
     setEditingId(null);
@@ -101,6 +100,17 @@ export default function App() {
     setAdminOpen(true);
   }
 
+  async function login() {
+    setError('');
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      setPassword('');
+      setAdminOpen(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '로그인 실패');
+    }
+  }
+
   async function saveLens() {
     if (!brand.trim() || !productName.trim() || !price.trim()) {
       setError('브랜드, 제품명, 가격을 입력해 주세요.');
@@ -108,6 +118,7 @@ export default function App() {
     }
 
     const numericPrice = Number(price.replace(/,/g, ''));
+
     if (!Number.isFinite(numericPrice) || numericPrice < 0) {
       setError('올바른 가격을 입력해 주세요.');
       return;
@@ -121,6 +132,7 @@ export default function App() {
     };
 
     setError('');
+
     try {
       if (editingId) {
         await updateDoc(doc(lensCollection, editingId), data);
@@ -137,6 +149,7 @@ export default function App() {
     if (!window.confirm('이 상품을 삭제할까요?')) return;
 
     setError('');
+
     try {
       await deleteDoc(doc(lensCollection, id));
     } catch (err) {
@@ -144,13 +157,19 @@ export default function App() {
     }
   }
 
+  const keyword = search.trim().toLowerCase();
+
   const filteredLenses = lenses.filter((lens) => {
-    const keyword = search.trim().toLowerCase();
-    return (
+    const matchesBrand =
+      selectedBrand === '전체' || lens.brand.trim() === selectedBrand;
+
+    const matchesSearch =
+      !keyword ||
       lens.brand.toLowerCase().includes(keyword) ||
       lens.productName.toLowerCase().includes(keyword) ||
-      lens.specification.toLowerCase().includes(keyword)
-    );
+      lens.specification.toLowerCase().includes(keyword);
+
+    return matchesBrand && matchesSearch;
   });
 
   return (
@@ -162,8 +181,8 @@ export default function App() {
       </header>
 
       <section className="results">
-        <p>{status}</p>
-        {error && <p role="alert">오류: {error}</p>}
+        <p className="connection-status">{status}</p>
+        {error && <p role="alert" className="error-message">오류: {error}</p>}
 
         <input
           className="search-input"
@@ -172,36 +191,62 @@ export default function App() {
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        <p>검색 결과 {filteredLenses.length}개</p>
+        <div className="brand-filter" aria-label="브랜드 선택">
+          {brands.map((item) => (
+            <button
+              key={item}
+              type="button"
+              className={`brand-filter-button ${
+                selectedBrand === item ? 'active' : ''
+              }`}
+              aria-pressed={selectedBrand === item}
+              onClick={() => setSelectedBrand(item)}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
 
-        {filteredLenses.map((lens) => (
-          <article className="lens-card" key={lens.id}>
-            <div>
-              <span className="brand-name">{lens.brand}</span>
-              <h2>{lens.productName}</h2>
-              <p>{lens.specification}</p>
-            </div>
-            <div>
-              <strong>{lens.price.toLocaleString('ko-KR')}원</strong>
-              {user && (
-                <div>
-                  <button onClick={() => editLens(lens)}>수정</button>
-                  <button onClick={() => removeLens(lens.id)}>삭제</button>
-                </div>
-              )}
-            </div>
-          </article>
-        ))}
+        <p className="result-count">
+          검색 결과 <strong>{filteredLenses.length}</strong>개
+        </p>
 
-        {filteredLenses.length === 0 && <p>검색 결과가 없습니다.</p>}
+        <div className="lens-list">
+          {filteredLenses.map((lens) => (
+            <article className="lens-card" key={lens.id}>
+              <div className="lens-info">
+                <span className="brand-name">{lens.brand}</span>
+                <h2>{lens.productName}</h2>
+                {lens.specification && (
+                  <p className="lens-specification">{lens.specification}</p>
+                )}
+              </div>
+
+              <div className="lens-price">
+                <strong>{lens.price.toLocaleString('ko-KR')}원</strong>
+                {user && (
+                  <div className="admin-actions">
+                    <button onClick={() => editLens(lens)}>수정</button>
+                    <button onClick={() => removeLens(lens.id)}>삭제</button>
+                  </div>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+
+        {filteredLenses.length === 0 && (
+          <p className="empty-results">검색 결과가 없습니다.</p>
+        )}
 
         <hr />
+
         <button onClick={() => setAdminOpen(!adminOpen)}>
           {adminOpen ? '관리자 메뉴 닫기' : '관리자'}
         </button>
 
         {adminOpen && (
-          <section>
+          <section className="admin-panel">
             {!user ? (
               <div>
                 <h2>관리자 로그인</h2>
