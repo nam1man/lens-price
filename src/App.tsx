@@ -58,15 +58,16 @@ function LensVariant({variant,option}:{variant:SpectacleLens;option?:LensOption}
   const total=(coatingItem?.price ?? variant.price ?? 0)+chosenExtras.reduce((n,x)=>n+x.add,0);
   return <div className="nikon-variant-wrap">
     <button type="button" className="spectacle-variant nikon-variant-button" onClick={()=>setExpanded(v=>!v)} aria-expanded={expanded}>
-      <span>{variant.index} <small className="nikon-option-hint">{expanded?'접기':'옵션 선택 ▾'}</small></span>
+      <span>{variant.index} <small className="nikon-option-hint">{expanded?'접기':'코팅·변색 선택 ▾'}</small></span>
       <strong>{priceText(variant.price)}</strong>
     </button>
     {expanded && <div className="nikon-option-panel">
       {option ? <>
         <div className="nikon-option-label">코팅·가격 선택</div>
         <div className="nikon-option-choices">{option.coatings.map(c=><label key={c.id} className={'nikon-option-choice '+(coating===c.id?'selected':'')}><input type="radio" name={'coat-'+variant.manufacturer+'-'+variant.name+'-'+variant.index} checked={coating===c.id} onChange={()=>setCoating(c.id)}/><span>{c.label}</span><b>{priceText(c.price)}</b></label>)}</div>
-        {option.manufacturer === '에실로' && !['아이젠 K','스텔리스트'].includes(option.name) && <p className="nikon-option-warning">코팅·변색 옵션별 추가금은 확인되지 않아 기본 가격만 표시합니다.</p>}
-        {option.extras.length>0 && <><div className="nikon-option-label">추가 옵션</div><div className="nikon-option-choices">{option.extras.map(x=><label key={x.id} className="nikon-option-choice"><input type="checkbox" checked={extras.includes(x.id)} onChange={e=>setExtras(a=>e.target.checked?[...a,x.id]:a.filter(y=>y!==x.id))}/><span>{x.label}</span><b>+{priceText(x.add)}</b></label>)}</div></>}
+        
+        {option.extras.filter(x=>/변색/.test(x.label)).length>0 && <><div className="nikon-option-label">변색 옵션</div><div className="nikon-option-choices">{option.extras.filter(x=>/변색/.test(x.label)).map(x=><label key={x.id} className="nikon-option-choice"><input type="checkbox" checked={extras.includes(x.id)} onChange={e=>setExtras(a=>e.target.checked?(x.id==='gens'||x.id==='xtractive'?[...a.filter(y=>y!=='gens'&&y!=='xtractive'),x.id]:[...a,x.id]):a.filter(y=>y!==x.id))}/><span>{x.label}</span><b>+{priceText(x.add)}</b></label>)}</div></>}
+        {option.extras.filter(x=>!/변색/.test(x.label)).length>0 && <><div className="nikon-option-label">추가 옵션</div><div className="nikon-option-choices">{option.extras.filter(x=>!/변색/.test(x.label)).map(x=><label key={x.id} className="nikon-option-choice"><input type="checkbox" checked={extras.includes(x.id)} onChange={e=>setExtras(a=>e.target.checked?[...a,x.id]:a.filter(y=>y!==x.id))}/><span>{x.label}</span><b>+{priceText(x.add)}</b></label>)}</div></>}
         <div className="nikon-option-total"><span>선택 옵션 포함 가격</span><strong>{coatingItem?.price == null && variant.price == null ? '가격 확인 필요' : priceText(total)}</strong></div>
         <p className="nikon-option-warning">검토용 데이터입니다. 코팅·변색·착색·프리즘 조합 가능 여부와 추가금은 제조사 원본 가격표를 확인하세요. 확인되지 않은 옵션은 표시하지 않았습니다.</p>
       </> : <p className="nikon-option-warning">옵션 가격 자료가 아직 확인되지 않았습니다. 기본 가격만 확인할 수 있습니다.</p>}
@@ -181,7 +182,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    fetch('/lens_options.json').then(r=>{if(!r.ok)throw Error('옵션 데이터 없음');return r.json()}).then((data:LensOption[])=>setLensOptions(data)).catch(()=>setLensOptions([]));
+    fetch('/lens_options.json?v=essilor-20261013-full', {cache:'no-store'}).then(r=>{if(!r.ok)throw Error('옵션 데이터 없음');return r.json()}).then((data:LensOption[])=>setLensOptions(data)).catch(()=>setLensOptions([]));
   }, []);
 
   const spectacleGroups = useMemo(() => {
