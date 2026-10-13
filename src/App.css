@@ -860,3 +860,32 @@ details[open] > summary .group-chevron { transform:rotate(180deg); }
 .spectacle-groups .spectacle-variant>span{display:block;min-width:0;white-space:normal}
 .spectacle-groups .spectacle-variant>strong{display:block;min-width:100px;text-align:right;color:#202d3b;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
 @media(max-width:480px){.lens-type-tabs{margin:13px 0 17px}.spectacle-groups .brand-heading{padding:15px}.spectacle-groups .category-list{padding:0 8px 8px}.spectacle-groups .category-heading{padding:12px}.spectacle-groups .spectacle-products{padding:0 7px 8px;gap:7px}.spectacle-groups .spectacle-product-title{padding:12px;font-size:14px}.spectacle-groups .spectacle-variants{padding:0 12px 3px}.spectacle-groups .spectacle-variant{gap:8px;padding:11px 0;font-size:13px}.spectacle-groups .spectacle-variant>strong{min-width:90px;font-size:14px}}
+
+/* ===== GLOSS premium lens UI: isolated overrides ===== */
+.lens-type-tabs{width:min(100%,680px);box-sizing:border-box;margin:18px auto 20px;padding:5px;display:grid;grid-template-columns:1fr 1fr;gap:3px;border-radius:999px;border:1px solid #b8d1e6;background:#1765a4;box-shadow:0 5px 18px rgba(10,70,122,.12)}
+.lens-type-tab{appearance:none;display:flex;align-items:center;justify-content:center;gap:10px;min-width:0;min-height:54px;border:0;border-radius:999px;background:transparent;color:#fff;font-size:16px;font-weight:800;cursor:pointer;transition:background .2s,color .2s,box-shadow .2s}
+.lens-type-tab.active{background:#fff;color:#1164ae;box-shadow:0 3px 10px rgba(9,45,89,.16)}
+.lens-type-tab .tab-icon{font-size:24px;line-height:1;font-weight:600}
+.spectacle-section{max-width:100%;min-width:0;padding:0 0 28px}
+.spectacle-search{height:54px;border:1px solid #d6e0e9;border-radius:15px;padding:0 17px;box-shadow:0 2px 8px rgba(20,50,90,.05);font-size:15px}
+.spectacle-note{font-size:13px;color:#50627a;margin:12px 2px 20px}
+.spectacle-groups>.brand-group{border:1px solid #dce4ed;border-radius:18px;background:#fff;overflow:hidden}
+.spectacle-groups .brand-heading{padding:18px 20px;background:linear-gradient(115deg,#13558f,#0873bc);color:white;font-size:18px;font-weight:800}
+.spectacle-groups .brand-heading .group-chevron{color:#fff}
+.spectacle-brand-icon{width:33px;height:33px;display:grid;place-items:center;background:white;color:#1164a5;border-radius:50%;font-size:23px}
+.spectacle-total{font-size:12px;font-weight:600;color:#e5f2ff;white-space:nowrap}
+.spectacle-groups .category-list{padding:12px;gap:10px}
+.spectacle-groups .category-group{background:#f6f8fb;border:1px solid #e1e8f0;border-radius:13px}
+.spectacle-groups .category-heading{padding:16px 17px;font-size:16px;color:#183450;font-weight:800}
+.spectacle-groups .category-heading .group-count{color:#16836e;background:#e0f2ed}
+.spectacle-groups .spectacle-products{padding:0 11px 12px;gap:10px}
+.spectacle-groups .spectacle-product{border:1px solid #e0e7ef;border-radius:12px;background:#fff}
+.spectacle-groups .spectacle-product-title{padding:16px 17px;font-size:16px;font-weight:800;color:#1a334f}
+.spectacle-groups .spectacle-variants{padding:0 14px 8px;border-top:0;background:#fff}
+.spectacle-groups .spectacle-variant{display:grid;grid-template-columns:minmax(0,1fr) minmax(130px,1fr);align-items:center;gap:12px;min-height:45px;padding:9px 15px;border-bottom:1px solid #e7edf4;box-sizing:border-box;font-size:15px;color:#19334e}
+.spectacle-groups .spectacle-variant>span{font-weight:650}
+.spectacle-groups .spectacle-variant>strong{min-width:0;text-align:right;font-size:16px;font-weight:800;color:#0e1c2e;white-space:nowrap}
+.spectacle-groups .spectacle-variant-head{min-height:38px;background:#eef4fb;border-radius:8px 8px 0 0;color:#596c83;font-size:12px}
+.spectacle-groups .spectacle-variant-head>span{font-weight:650}
+.spectacle-groups .spectacle-variant-head>span:last-child{text-align:right}
+@media(max-width:480px){.lens-type-tab{min-height:49px;font-size:14px;gap:6px}.lens-type-tab .tab-icon{font-size:20px}.spectacle-groups .brand-heading{padding:13px}.spectacle-groups .category-list{padding:8px}.spectacle-groups .category-heading{padding:12px;font-size:14px}.spectacle-groups .spectacle-product-title{padding:13px;font-size:14px}.spectacle-groups .spectacle-variants{padding:0 7px 7px}.spectacle-groups .spectacle-variant{grid-template-columns:minmax(0,1fr) minmax(115px,1fr);padding:9px 10px;font-size:14px}.spectacle-groups .spectacle-variant>strong{font-size:14px}.spectacle-total{font-size:11px}}
