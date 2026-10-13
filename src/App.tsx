@@ -36,6 +36,17 @@ type Lens = {
   price: number;
 };
 
+
+
+type SpectacleLens = {
+  manufacturer: string;
+  family: string;
+  name: string;
+  index: string;
+  price: number | null;
+  verification: string;
+};
+
 const lensCollection = collection(db, 'products', 'name', 'Lens');
 
 function priceText(val: number | null): string {
@@ -58,6 +69,10 @@ function firestoreToPrice(val: unknown): number | null {
 
 export default function App() {
   const [lenses, setLenses] = useState<Lens[]>([]);
+  const [lensTab, setLensTab] = useState<'contact' | 'spectacle'>('contact');
+  const [spectacleLenses, setSpectacleLenses] = useState<SpectacleLens[]>([]);
+  const [spectacleSearch, setSpectacleSearch] = useState('');
+  const [spectacleError, setSpectacleError] = useState('');
   const [search, setSearch] = useState('');
   const [brandFilter, setBrandFilter] = useState('전체');
   const [user, setUser] = useState<User | null>(null);
@@ -126,6 +141,39 @@ export default function App() {
       unsubscribeData();
     };
   }, []);
+
+  useEffect(() => {
+    fetch('/spectacle_lenses.json')
+      .then((response) => {
+        if (!response.ok) throw new Error('안경렌즈 데이터 파일을 불러오지 못했습니다.');
+        return response.json();
+      })
+      .then((data: SpectacleLens[]) => setSpectacleLenses(data))
+      .catch((err: unknown) => setSpectacleError(err instanceof Error ? err.message : '안경렌즈 데이터 로딩 실패'));
+  }, []);
+
+  const spectacleGroups = useMemo(() => {
+    const q = spectacleSearch.trim().toLowerCase();
+    const matched = spectacleLenses.filter((lens) =>
+      [lens.manufacturer, lens.family, lens.name, lens.index].some((s) => s.toLowerCase().includes(q))
+    );
+    const groups = new Map<string, Map<string, Map<string, SpectacleLens[]>>>();
+    for (const lens of matched) {
+      if (!groups.has(lens.manufacturer)) groups.set(lens.manufacturer, new Map());
+      const families = groups.get(lens.manufacturer)!;
+      if (!families.has(lens.family)) families.set(lens.family, new Map());
+      const products = families.get(lens.family)!;
+      if (!products.has(lens.name)) products.set(lens.name, []);
+      products.get(lens.name)!.push(lens);
+    }
+    return Array.from(groups, ([manufacturer, families]) => ({
+      manufacturer,
+      families: Array.from(families, ([family, products]) => ({
+        family,
+        products: Array.from(products, ([name, variants]) => ({name, variants})),
+      })),
+    }));
+  }, [spectacleLenses, spectacleSearch]);
 
   function clearMessages() {
     setError('');
@@ -529,8 +577,8 @@ export default function App() {
     <div className="app">
       <header className="header">
         <div className="logo">GLOSS OPTICAL</div>
-        <h1>콘택트렌즈 가격표</h1>
-        <p className="subtitle">브랜드와 제품명을 확인해 보세요.</p>
+        <h1>{lensTab === 'contact' ? '콘택트렌즈 가격표' : '안경렌즈 가격표'}</h1>
+        <p className="subtitle">제품명과 굴절률별 가격을 확인해 보세요.</p>
       </header>
 
       <div className="status-bar">
@@ -539,6 +587,51 @@ export default function App() {
         {success && <span className="alert-success">{success}</span>}
       </div>
 
+      <nav className="lens-type-tabs" aria-label="렌즈 가격표 종류">
+        <button type="button" className={lensTab === 'contact' ? 'lens-type-tab active' : 'lens-type-tab'} onClick={() => setLensTab('contact')}>콘택트렌즈</button>
+        <button type="button" className={lensTab === 'spectacle' ? 'lens-type-tab active' : 'lens-type-tab'} onClick={() => setLensTab('spectacle')}>안경렌즈</button>
+      </nav>
+
+      {lensTab === 'spectacle' && (
+        <section className="spectacle-section">
+          <input className="search-input spectacle-search" aria-label="안경렌즈 검색" placeholder="제조사, 제품군, 제품명, 굴절률 검색" value={spectacleSearch} onChange={(e) => setSpectacleSearch(e.target.value)} />
+          <p className="spectacle-note">에실로 가격표 · 원본 대조 전 검토용 데이터입니다. 실제 판매·견적 시 최신 가격표를 확인하세요.</p>
+          {spectacleError && <p className="alert-error">{spectacleError}</p>}
+          <p className="result-count">굴절률별 가격 {spectacleGroups.reduce((n,g) => n + g.families.reduce((m,f) => m + f.products.reduce((k,p) => k + p.variants.length,0),0),0)}개</p>
+          <div className="spectacle-groups">
+            {spectacleGroups.map((group) => (
+              <details className="brand-group" key={group.manufacturer} open={spectacleSearch.trim() ? true : undefined}>
+                <summary className="group-heading brand-heading">{group.manufacturer}<span className="group-chevron">⌄</span></summary>
+                <div className="category-list">
+                  {group.families.map((family) => (
+                    <details className="category-group" key={family.family} open={spectacleSearch.trim() ? true : undefined}>
+                      <summary className="group-heading category-heading">{family.family}<span className="group-count">{family.products.length}개 제품</span><span className="group-chevron">⌄</span></summary>
+                      <div className="spectacle-products">
+                        {family.products.map((product) => (
+                          <details className="spectacle-product" key={product.name} open={spectacleSearch.trim() ? true : undefined}>
+                            <summary className="spectacle-product-title">{product.name}<span className="group-chevron">⌄</span></summary>
+                            <div className="spectacle-variants">
+                              {product.variants.map((v,i) => (
+                                <div className="spectacle-variant" key={`${v.index}-${i}`}>
+                                  <span>굴절률 {v.index}</span>
+                                  <strong>{v.price === null ? '가격 확인 필요' : priceText(v.price)}</strong>
+                                </div>
+                              ))}
+                            </div>
+                          </details>
+                        ))}
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </details>
+            ))}
+          </div>
+          {!spectacleError && spectacleGroups.length === 0 && <p className="no-results">검색 결과가 없습니다.</p>}
+        </section>
+      )}
+
+      {lensTab === 'contact' && <>
       {/* Customer view: search + brand filter + product list */}
       <section className="customer-section">
         <div className="search-bar">
@@ -629,6 +722,8 @@ export default function App() {
           <p className="no-results">검색 결과가 없습니다.</p>
         )}
       </section>
+
+      </>}
 
       {/* Admin section */}
       <div className="admin-toggle">
