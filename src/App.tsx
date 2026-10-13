@@ -1,834 +1,1020 @@
-/* ===== App Layout ===== */
-.app {
-  width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* ===== Header ===== */
-.header {
-  text-align: center;
-  padding: 32px 16px 20px;
-  background: linear-gradient(135deg, #0f4c81 0%, #1a6bb4 100%);
-  color: #fff;
-  border-radius: 0 0 20px 20px;
-  box-shadow: 0 4px 20px rgba(15, 76, 129, 0.15);
-}
-
-.logo {
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 3px;
-  opacity: 0.85;
-  margin-bottom: 6px;
-}
-
-.header h1 {
-  font-size: 28px;
-  font-weight: 600;
-  margin: 0 0 4px;
-  color: #fff;
-}
-
-.subtitle {
-  font-size: 14px;
-  opacity: 0.8;
-}
-
-/* ===== Status Bar ===== */
-.status-bar {
-  padding: 10px 16px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-
-.status-text {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-/* ===== Alerts ===== */
-.alert-error {
-  color: #c0392b;
-  background: #fdf0ee;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  border: 1px solid #f5c6cb;
-}
-
-.alert-success {
-  color: #1a7d34;
-  background: #edf7ef;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  border: 1px solid #c3e6cb;
-}
-
-/* ===== Customer Section ===== */
-.customer-section {
-  padding: 8px 16px 16px;
-  flex-grow: 1;
-}
-
-.search-bar {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-
-.search-input {
-  flex: 1 1 200px;
-  padding: 10px 14px;
-  font-size: 15px;
-  border: 2px solid var(--border);
-  border-radius: 10px;
-  outline: none;
-  transition: border-color 0.2s;
-  background: var(--surface);
-  color: var(--text-strong);
-}
-
-.search-input:focus {
-  border-color: var(--primary);
-}
-
-.search-input::placeholder {
-  color: var(--text-muted);
-}
-
-.brand-filter {
-  flex: 0 1 160px;
-  padding: 10px 14px;
-  font-size: 15px;
-  border: 2px solid var(--border);
-  border-radius: 10px;
-  outline: none;
-  background: var(--surface);
-  color: var(--text-strong);
-  cursor: pointer;
-  transition: border-color 0.2s;
-}
-
-.brand-filter:focus {
-  border-color: var(--primary);
-}
-
-.result-count {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 10px;
-}
-
-/* ===== Card List ===== */
-.card-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.lens-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: stretch;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 16px;
-  gap: 12px;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-
-.lens-card:hover {
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  border-color: var(--primary-light);
-}
-
-.card-left {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.brand-badge {
-  display: inline-block;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--primary);
-  background: var(--primary-bg);
-  padding: 2px 8px;
-  border-radius: 6px;
-  margin-bottom: 4px;
-}
-
-.product-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-strong);
-  margin: 0 0 6px;
-  line-height: 1.3;
-  word-break: keep-all;
-}
-
-.card-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.meta-tag {
-  font-size: 12px;
-  color: var(--text-muted);
-  background: var(--tag-bg);
-  padding: 2px 7px;
-  border-radius: 5px;
-}
-
-.meta-pack {
-  font-weight: 500;
-  color: var(--secondary);
-  background: var(--secondary-bg);
-}
-
-.card-right {
-  flex: 0 0 auto;
-  text-align: right;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 8px;
-  min-width: 100px;
-}
-
-.price-block {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-}
-
-.price-main {
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--text-strong);
-  white-space: nowrap;
-}
-
-.price-old {
-  font-size: 12px;
-  color: var(--text-muted);
-  text-decoration: line-through;
-}
-
-.price-unit {
-  font-size: 12px;
-  color: var(--secondary);
-}
-
-.card-actions {
-  display: flex;
-  gap: 6px;
-}
-
-/* ===== Buttons ===== */
-.btn-sm {
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s, opacity 0.2s;
-  font-weight: 500;
-}
-
-.btn-edit {
-  background: var(--primary-bg);
-  color: var(--primary);
-}
-
-.btn-edit:hover {
-  background: var(--primary-light);
-  color: #fff;
-}
-
-.btn-del {
-  background: #fdf0ee;
-  color: #c0392b;
-}
-
-.btn-del:hover {
-  background: #c0392b;
-  color: #fff;
-}
-
-.btn-cancel {
-  background: var(--tag-bg);
-  color: var(--text-muted);
-}
-
-.btn-cancel:hover {
-  background: var(--border);
-}
-
-.btn-primary {
-  padding: 10px 20px;
-  font-size: 15px;
-  font-weight: 600;
-  border: none;
-  border-radius: 10px;
-  background: var(--primary);
-  color: #fff;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-primary:hover {
-  background: var(--primary-dark);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-danger {
-  background: #c0392b;
-}
-
-.btn-danger:hover {
-  background: #a32a1e;
-}
-
-.btn-bundled {
-  padding: 8px 14px;
-  font-size: 13px;
-  white-space: nowrap;
-}
-
-.btn-secondary {
-  padding: 10px 20px;
-  font-size: 15px;
-  font-weight: 500;
-  border: 2px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
-  color: var(--text-strong);
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-}
-
-.btn-secondary:hover {
-  border-color: var(--primary);
-  background: var(--primary-bg);
-}
-
-.btn-toggle {
-  padding: 8px 20px;
-  font-size: 14px;
-  font-weight: 500;
-  border: 2px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-toggle:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
-/* ===== No Results ===== */
-.no-results {
-  text-align: center;
-  color: var(--text-muted);
-  padding: 40px 0;
-  font-size: 15px;
-}
-
-/* ===== Admin Toggle ===== */
-.admin-toggle {
-  text-align: center;
-  padding: 8px 16px 16px;
-}
-
-/* ===== Admin Section ===== */
-.admin-section {
-  padding: 0 16px 24px;
-}
-
-.admin-login {
-  max-width: 400px;
-  margin: 0 auto;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 24px;
-  text-align: center;
-}
-
-.admin-login h2 {
-  margin: 0 0 16px;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.admin-panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 20px;
-}
-
-.admin-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.admin-header h2 {
-  margin: 0;
-  font-size: 20px;
-}
-
-.admin-email {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-/* ===== CSV Section ===== */
-.csv-section {
-  background: var(--highlight-bg);
-  border-radius: 10px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-.csv-section h3 {
-  margin: 0 0 6px;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-strong);
-}
-
-.csv-help {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 12px;
-  line-height: 1.5;
-}
-
-.csv-upload-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.file-input {
-  flex: 1 1 200px;
-  font-size: 14px;
-}
-
-.csv-mode-row {
-  margin-top: 10px;
-}
-
-.quick-replace-section {
-  background: #fdf0ee;
-  border: 1px solid #f5c6cb;
-  border-radius: 10px;
-  padding: 14px;
-  margin-bottom: 14px;
-  text-align: center;
-}
-
-.btn-large {
-  width: 100%;
-  padding: 12px 20px;
-  font-size: 16px;
-}
-
-.quick-replace-hint {
-  font-size: 13px;
-  color: #8a3221;
-  margin-top: 8px;
-  line-height: 1.4;
-}
-
-.csv-mode-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  color: var(--text-strong);
-  cursor: pointer;
-  user-select: none;
-}
-
-.csv-mode-label input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-}
-
-.csv-preview {
-  margin-top: 14px;
-}
-
-.csv-preview-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.dup-warning {
-  font-size: 13px;
-  color: #c0392b;
-  background: #fdf0ee;
-  padding: 3px 10px;
-  border-radius: 6px;
-  border: 1px solid #f5c6cb;
-}
-
-.dup-ok {
-  font-size: 13px;
-  color: #1a7d34;
-  background: #edf7ef;
-  padding: 3px 10px;
-  border-radius: 6px;
-  border: 1px solid #c3e6cb;
-}
-
-.dup-list {
-  background: #fdf0ee;
-  border: 1px solid #f5c6cb;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 12px;
-}
-
-.dup-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: #c0392b;
-  margin-bottom: 6px;
-}
-
-.dup-list ul {
-  margin: 0 0 8px;
-  padding-left: 18px;
-  font-size: 13px;
-  color: #8a3221;
-}
-
-.dup-list li {
-  margin-bottom: 2px;
-}
-
-.dup-existing {
-  color: var(--text-muted);
-  font-size: 12px;
-}
-
-.dup-hint {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-/* ===== CSV Table ===== */
-.csv-table-wrap {
-  overflow-x: auto;
-  margin-bottom: 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-}
-
-.csv-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-  white-space: nowrap;
-}
-
-.csv-table th {
-  background: var(--highlight-bg);
-  color: var(--text-strong);
-  font-weight: 600;
-  text-align: left;
-  padding: 8px 10px;
-  border-bottom: 2px solid var(--border);
-  position: sticky;
-  top: 0;
-}
-
-.csv-table td {
-  padding: 6px 10px;
-  border-bottom: 1px solid var(--border);
-  color: var(--text-body);
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.csv-table tr:last-child td {
-  border-bottom: none;
-}
-
-.row-dup {
-  background: #fdf0ee;
-}
-
-/* ===== Divider ===== */
-.divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 16px 0;
-}
-
-/* ===== Edit Section ===== */
-.edit-section h3 {
-  margin: 0 0 12px;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.form-row {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.form-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-.form-input {
-  padding: 8px 12px;
-  font-size: 14px;
-  border: 2px solid var(--border);
-  border-radius: 8px;
-  outline: none;
-  transition: border-color 0.2s;
-  background: var(--surface);
-  color: var(--text-strong);
-}
-
-.form-input:focus {
-  border-color: var(--primary);
-}
-
-.form-input::placeholder {
-  color: var(--text-muted);
-}
-
-.form-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-/* ===== Footer ===== */
-.footer {
-  text-align: center;
-  padding: 16px;
-  border-top: 1px solid var(--border);
-  margin-top: auto;
-}
-
-.footer small {
-  font-size: 12px;
-  color: var(--text-muted);
-  letter-spacing: 1px;
-}
-
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
-  .header {
-    padding: 24px 16px 16px;
-    border-radius: 0 0 16px 16px;
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  collection,
+  onSnapshot,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from 'firebase/firestore';
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  type User,
+} from 'firebase/auth';
+import { db, auth } from './firebase';
+import {
+  parseCsv,
+  findDuplicates,
+  type CsvRow,
+  type DuplicateInfo,
+} from './csvImport';
+import './App.css';
+
+type Lens = {
+  id: string;
+  brand: string;
+  productName: string;
+  specification: string;
+  lensType: string;
+  wearType: string;
+  packQuantity: string;
+  displayPrice: number | null;
+  oldPrice: number | null;
+  unitPrice: number | null;
+  price: number;
+};
+
+
+
+type SpectacleLens = {
+  manufacturer: string;
+  family: string;
+  name: string;
+  index: string;
+  price: number | null;
+  verification: string;
+};
+
+const lensCollection = collection(db, 'products', 'name', 'Lens');
+
+function priceText(val: number | null): string {
+  if (val === null || val === undefined) return '미입력';
+  return `${val.toLocaleString('ko-KR')}원`;
+}
+
+function priceToFirestore(val: string): number | null {
+  if (val.trim() === '') return null;
+  const num = Number(val.replace(/,/g, ''));
+  if (!Number.isFinite(num) || num < 0) return null;
+  return num;
+}
+
+function firestoreToPrice(val: unknown): number | null {
+  if (val === null || val === undefined || val === '') return null;
+  const num = Number(val);
+  return Number.isFinite(num) ? num : null;
+}
+
+export default function App() {
+  const [lenses, setLenses] = useState<Lens[]>([]);
+  const [lensTab, setLensTab] = useState<'contact' | 'spectacle'>('contact');
+  const [spectacleLenses, setSpectacleLenses] = useState<SpectacleLens[]>([]);
+  const [spectacleSearch, setSpectacleSearch] = useState('');
+  const [spectacleError, setSpectacleError] = useState('');
+  const [search, setSearch] = useState('');
+  const [brandFilter, setBrandFilter] = useState('전체');
+  const [user, setUser] = useState<User | null>(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [adminOpen, setAdminOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [brand, setBrand] = useState('');
+  const [productName, setProductName] = useState('');
+  const [specification, setSpecification] = useState('');
+  const [lensType, setLensType] = useState('');
+  const [wearType, setWearType] = useState('');
+  const [packQuantity, setPackQuantity] = useState('');
+  const [displayPrice, setDisplayPrice] = useState('');
+  const [oldPrice, setOldPrice] = useState('');
+  const [unitPrice, setUnitPrice] = useState('');
+  const [status, setStatus] = useState('Firebase 연결 확인 중...');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  // CSV upload state
+  const [csvRows, setCsvRows] = useState<CsvRow[]>([]);
+  const [csvFileName, setCsvFileName] = useState('');
+  const [csvDuplicates, setCsvDuplicates] = useState<DuplicateInfo[]>([]);
+  const [csvUploading, setCsvUploading] = useState(false);
+  const [csvError, setCsvError] = useState('');
+  const [csvSuccess, setCsvSuccess] = useState('');
+  const [replaceMode, setReplaceMode] = useState(false);
+  const [replacing, setReplacing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(auth, setUser);
+    const unsubscribeData = onSnapshot(
+      lensCollection,
+      (snapshot) => {
+        setLenses(
+          snapshot.docs.map((item) => {
+            const data = item.data();
+            return {
+              id: item.id,
+              brand: String(data.brand ?? ''),
+              productName: String(data.productName ?? ''),
+              specification: String(data.specification ?? ''),
+              lensType: String(data.lensType ?? ''),
+              wearType: String(data.wearType ?? ''),
+              packQuantity: String(data.packQuantity ?? ''),
+              displayPrice: firestoreToPrice(data.displayPrice),
+              oldPrice: firestoreToPrice(data.oldPrice),
+              unitPrice: firestoreToPrice(data.unitPrice),
+              price: Number(data.price ?? 0),
+            };
+          })
+        );
+        setStatus('Firebase 연결 성공');
+        setError('');
+      },
+      (err) => {
+        setError(err.message);
+        setStatus('Firebase 읽기 실패');
+      }
+    );
+
+    return () => {
+      unsubscribeAuth();
+      unsubscribeData();
+    };
+  }, []);
+
+  useEffect(() => {
+    fetch('/spectacle_lenses.json')
+      .then((response) => {
+        if (!response.ok) throw new Error('안경렌즈 데이터 파일을 불러오지 못했습니다.');
+        return response.json();
+      })
+      .then((data: SpectacleLens[]) => setSpectacleLenses(data))
+      .catch((err: unknown) => setSpectacleError(err instanceof Error ? err.message : '안경렌즈 데이터 로딩 실패'));
+  }, []);
+
+  const spectacleGroups = useMemo(() => {
+    const q = spectacleSearch.trim().toLowerCase();
+    const matched = spectacleLenses.filter((lens) =>
+      [lens.manufacturer, lens.family, lens.name, lens.index].some((s) => s.toLowerCase().includes(q))
+    );
+    const groups = new Map<string, Map<string, Map<string, SpectacleLens[]>>>();
+    for (const lens of matched) {
+      if (!groups.has(lens.manufacturer)) groups.set(lens.manufacturer, new Map());
+      const families = groups.get(lens.manufacturer)!;
+      if (!families.has(lens.family)) families.set(lens.family, new Map());
+      const products = families.get(lens.family)!;
+      if (!products.has(lens.name)) products.set(lens.name, []);
+      products.get(lens.name)!.push(lens);
+    }
+    return Array.from(groups, ([manufacturer, families]) => ({
+      manufacturer,
+      families: Array.from(families, ([family, products]) => ({
+        family,
+        products: Array.from(products, ([name, variants]) => ({name, variants})),
+      })),
+    }));
+  }, [spectacleLenses, spectacleSearch]);
+
+  function clearMessages() {
+    setError('');
+    setSuccess('');
+    setCsvError('');
+    setCsvSuccess('');
   }
 
-  .header h1 {
-    font-size: 22px;
+  async function login() {
+    clearMessages();
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      setPassword('');
+      setAdminOpen(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '로그인 실패');
+    }
   }
 
-  .search-bar {
-    flex-direction: column;
+  function resetForm() {
+    setEditingId(null);
+    setBrand('');
+    setProductName('');
+    setSpecification('');
+    setLensType('');
+    setWearType('');
+    setPackQuantity('');
+    setDisplayPrice('');
+    setOldPrice('');
+    setUnitPrice('');
   }
 
-  .search-input,
-  .brand-filter {
-    flex: 1 1 100%;
-    width: 100%;
+  function editLens(lens: Lens) {
+    setEditingId(lens.id);
+    setBrand(lens.brand);
+    setProductName(lens.productName);
+    setSpecification(lens.specification);
+    setLensType(lens.lensType);
+    setWearType(lens.wearType);
+    setPackQuantity(lens.packQuantity);
+    setDisplayPrice(lens.displayPrice !== null ? String(lens.displayPrice) : '');
+    setOldPrice(lens.oldPrice !== null ? String(lens.oldPrice) : '');
+    setUnitPrice(lens.unitPrice !== null ? String(lens.unitPrice) : '');
+    setAdminOpen(true);
   }
 
-  .lens-card {
-    flex-direction: row;
-    padding: 12px 14px;
+  async function saveLens() {
+    if (!brand.trim() || !productName.trim()) {
+      setError('브랜드와 제품명을 입력해 주세요.');
+      return;
+    }
+
+    const dispVal = priceToFirestore(displayPrice);
+    const oldVal = priceToFirestore(oldPrice);
+    const unitVal = priceToFirestore(unitPrice);
+
+    // Backward-compatible: price field = displayPrice or unitPrice or 0
+    const compatPrice = dispVal ?? unitVal ?? 0;
+
+    const data = {
+      brand: brand.trim(),
+      productName: productName.trim(),
+      specification: specification.trim(),
+      lensType: lensType.trim(),
+      wearType: wearType.trim(),
+      packQuantity: packQuantity.trim(),
+      displayPrice: dispVal,
+      oldPrice: oldVal,
+      unitPrice: unitVal,
+      price: compatPrice,
+    };
+
+    clearMessages();
+    try {
+      if (editingId) {
+        await updateDoc(doc(lensCollection, editingId), data);
+        setSuccess('상품이 수정되었습니다.');
+      } else {
+        await addDoc(lensCollection, data);
+        setSuccess('상품이 추가되었습니다.');
+      }
+      resetForm();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '저장 실패');
+    }
   }
 
-  .card-right {
-    min-width: 80px;
+  async function removeLens(id: string) {
+    if (!window.confirm('이 상품을 삭제할까요?')) return;
+    clearMessages();
+    try {
+      await deleteDoc(doc(lensCollection, id));
+      setSuccess('상품이 삭제되었습니다.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '삭제 실패');
+    }
   }
 
-  .price-main {
-    font-size: 16px;
+  // CSV file handling
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    clearMessages();
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setCsvFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = String(ev.target?.result ?? '');
+      try {
+        const result = parseCsv(text);
+        if (result.rows.length === 0) {
+          setCsvError('CSV 파일에서 유효한 데이터를 찾을 수 없습니다.');
+          setCsvRows([]);
+          setCsvDuplicates([]);
+          return;
+        }
+        const dups = findDuplicates(
+          result.rows,
+          lenses.map((l) => ({
+            id: l.id,
+            brand: l.brand,
+            productName: l.productName,
+            packQuantity: l.packQuantity,
+          }))
+        );
+        setCsvRows(result.rows);
+        setCsvDuplicates(dups);
+        setCsvError('');
+      } catch {
+        setCsvError('CSV 파일을 읽는 중 오류가 발생했습니다.');
+        setCsvRows([]);
+        setCsvDuplicates([]);
+      }
+    };
+    reader.onerror = () => {
+      setCsvError('파일을 읽을 수 없습니다.');
+    };
+    reader.readAsText(file, 'UTF-8');
   }
 
-  .form-grid {
-    grid-template-columns: 1fr 1fr;
+  function clearCsv() {
+    setCsvRows([]);
+    setCsvFileName('');
+    setCsvDuplicates([]);
+    setCsvError('');
+    setCsvSuccess('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
-  .admin-panel {
-    padding: 14px;
+  function rowToData(row: CsvRow) {
+    const dispVal = row.displayPrice;
+    const unitVal = row.unitPrice;
+    const compatPrice = dispVal ?? unitVal ?? 0;
+    return {
+      brand: row.brand.trim(),
+      productName: row.productName.trim(),
+      specification: row.packQuantity.trim(),
+      lensType: row.lensType.trim(),
+      wearType: row.wearType.trim(),
+      packQuantity: row.packQuantity.trim(),
+      displayPrice: dispVal,
+      oldPrice: row.oldPrice,
+      unitPrice: unitVal,
+      price: compatPrice,
+    };
   }
 
-  .csv-section {
-    padding: 12px;
+  async function uploadCsv() {
+    if (csvRows.length === 0) return;
+    if (csvDuplicates.length > 0) {
+      setCsvError(
+        `중복 항목 ${csvDuplicates.length}개가 있습니다. 중복 항목을 CSV에서 삭제하거나 수정한 후 다시 업로드해 주세요.`
+      );
+      return;
+    }
+
+    setCsvUploading(true);
+    clearMessages();
+    let added = 0;
+    let failed = 0;
+
+    try {
+      for (const row of csvRows) {
+        try {
+          await addDoc(lensCollection, rowToData(row));
+          added++;
+        } catch {
+          failed++;
+        }
+      }
+
+      if (failed === 0) {
+        setCsvSuccess(`${added}개 상품이 등록되었습니다.`);
+        clearCsv();
+      } else {
+        setCsvError(`${added}개 등록 성공, ${failed}개 실패.`);
+      }
+    } catch {
+      setCsvError('업로드 중 오류가 발생했습니다.');
+    } finally {
+      setCsvUploading(false);
+    }
   }
+
+  async function loadBundledCsv(): Promise<CsvRow[]> {
+    clearMessages();
+    setCsvFileName('lens_prices.csv (첨부 파일)');
+    try {
+      const resp = await fetch('/lens_prices.csv');
+      const text = await resp.text();
+      const result = parseCsv(text);
+      if (result.rows.length === 0) {
+        setCsvError('CSV 파일에서 유효한 데이터를 찾을 수 없습니다.');
+        setCsvRows([]);
+        setCsvDuplicates([]);
+        return [];
+      }
+      const dups = findDuplicates(
+        result.rows,
+        lenses.map((l) => ({
+          id: l.id,
+          brand: l.brand,
+          productName: l.productName,
+          packQuantity: l.packQuantity,
+        }))
+      );
+      setCsvRows(result.rows);
+      setCsvDuplicates(dups);
+      setCsvError('');
+      return result.rows;
+    } catch {
+      setCsvError('파일을 불러올 수 없습니다.');
+      setCsvRows([]);
+      setCsvDuplicates([]);
+      return [];
+    }
+  }
+
+  async function quickReplaceAll() {
+    const confirmed = window.confirm(
+      `기존 상품 ${lenses.length}개를 모두 삭제하고 첨부된 CSV 파일(${161}개)로 교체합니다.\n계속하시겠습니까?`
+    );
+    if (!confirmed) return;
+
+    setReplacing(true);
+    clearMessages();
+
+    try {
+      const resp = await fetch('/lens_prices.csv');
+      const text = await resp.text();
+      const result = parseCsv(text);
+      const newRows = result.rows;
+
+      if (newRows.length === 0) {
+        setCsvError('CSV 파일에서 유효한 데이터를 찾을 수 없습니다.');
+        return;
+      }
+
+      // Delete all existing products
+      for (const lens of lenses) {
+        try {
+          await deleteDoc(doc(lensCollection, lens.id));
+        } catch {
+          // continue even if some deletes fail
+        }
+      }
+
+      // Add all new products
+      let added = 0;
+      let failed = 0;
+      for (const row of newRows) {
+        try {
+          await addDoc(lensCollection, rowToData(row));
+          added++;
+        } catch {
+          failed++;
+        }
+      }
+
+      if (failed === 0) {
+        setCsvSuccess(
+          `기존 ${lenses.length}개 삭제 후 ${added}개 상품이 등록되었습니다.`
+        );
+      } else {
+        setCsvError(`${added}개 등록 성공, ${failed}개 실패.`);
+      }
+    } catch {
+      setCsvError('데이터 교체 중 오류가 발생했습니다.');
+    } finally {
+      setReplacing(false);
+    }
+  }
+
+  async function replaceAllData() {
+    if (csvRows.length === 0) return;
+    if (csvDuplicates.length > 0 && !replaceMode) {
+      setCsvError(
+        `중복 항목 ${csvDuplicates.length}개가 있습니다. 중복 항목을 CSV에서 삭제하거나 수정한 후 다시 시도해 주세요.`
+      );
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `기존 상품 ${lenses.length}개를 모두 삭제하고 CSV ${csvRows.length}개로 교체합니다.\n계속하시겠습니까?`
+    );
+    if (!confirmed) return;
+
+    setReplacing(true);
+    clearMessages();
+
+    try {
+      // Delete all existing products
+      for (const lens of lenses) {
+        try {
+          await deleteDoc(doc(lensCollection, lens.id));
+        } catch {
+          // continue even if some deletes fail
+        }
+      }
+
+      // Add all new products
+      let added = 0;
+      let failed = 0;
+      for (const row of csvRows) {
+        try {
+          await addDoc(lensCollection, rowToData(row));
+          added++;
+        } catch {
+          failed++;
+        }
+      }
+
+      if (failed === 0) {
+        setCsvSuccess(
+          `기존 ${lenses.length}개 삭제 후 ${added}개 상품이 등록되었습니다.`
+        );
+        clearCsv();
+        setReplaceMode(false);
+      } else {
+        setCsvError(`${added}개 등록 성공, ${failed}개 실패.`);
+      }
+    } catch {
+      setCsvError('데이터 교체 중 오류가 발생했습니다.');
+    } finally {
+      setReplacing(false);
+    }
+  }
+
+  // Brand list for filter
+  const brands = useMemo(() => {
+    const set = new Set<string>();
+    lenses.forEach((l) => {
+      if (l.brand.trim()) set.add(l.brand.trim());
+    });
+    return ['전체', ...Array.from(set).sort((a, b) => a.localeCompare(b, 'ko-KR'))];
+  }, [lenses]);
+
+  const filteredLenses = useMemo(() => {
+    const keyword = search.trim().toLowerCase();
+    return lenses
+      .filter((lens) => {
+        if (brandFilter !== '전체' && lens.brand.trim() !== brandFilter) return false;
+        if (!keyword) return true;
+        return (
+          lens.brand.toLowerCase().includes(keyword) ||
+          lens.productName.toLowerCase().includes(keyword) ||
+          lens.specification.toLowerCase().includes(keyword) ||
+          lens.lensType.toLowerCase().includes(keyword) ||
+          lens.wearType.toLowerCase().includes(keyword)
+        );
+      })
+      .sort((a, b) => {
+        const brandCmp = a.brand.localeCompare(b.brand, 'ko-KR');
+        if (brandCmp !== 0) return brandCmp;
+        return a.productName.localeCompare(b.productName, 'ko-KR');
+      });
+  }, [lenses, search, brandFilter]);
+
+  // Group the currently filtered products without changing Firestore data.
+  const groupedLenses = useMemo(() => {
+    const grouped = new Map<string, Map<string, Lens[]>>();
+    for (const lens of filteredLenses) {
+      const brandName = lens.brand.trim() || '기타 브랜드';
+      const category = [lens.wearType.trim(), lens.lensType.trim()]
+        .filter(Boolean)
+        .join(' · ') || '기타 제품군';
+      if (!grouped.has(brandName)) grouped.set(brandName, new Map());
+      const categories = grouped.get(brandName)!;
+      if (!categories.has(category)) categories.set(category, []);
+      categories.get(category)!.push(lens);
+    }
+    return Array.from(grouped, ([brandName, categories]) => ({
+      brandName,
+      categories: Array.from(categories, ([categoryName, items]) => ({ categoryName, items })),
+    }));
+  }, [filteredLenses]);
+
+  const nonDupCount = csvRows.length - csvDuplicates.length;
+
+  return (
+    <div className="app">
+      <header className="header">
+        <div className="logo">GLOSS OPTICAL</div>
+        <h1>{lensTab === 'contact' ? '콘택트렌즈 가격표' : '안경렌즈 가격표'}</h1>
+        <p className="subtitle">제품명과 굴절률별 가격을 확인해 보세요.</p>
+      </header>
+
+      <div className="status-bar">
+        <span className="status-text">{status}</span>
+        {error && <span className="alert-error" role="alert">{error}</span>}
+        {success && <span className="alert-success">{success}</span>}
+      </div>
+
+      <nav className="lens-type-tabs" aria-label="렌즈 가격표 종류">
+        <button type="button" className={lensTab === 'contact' ? 'lens-type-tab active' : 'lens-type-tab'} onClick={() => setLensTab('contact')}>콘택트렌즈</button>
+        <button type="button" className={lensTab === 'spectacle' ? 'lens-type-tab active' : 'lens-type-tab'} onClick={() => setLensTab('spectacle')}>안경렌즈</button>
+      </nav>
+
+      {lensTab === 'spectacle' && (
+        <section className="spectacle-section">
+          <input className="search-input spectacle-search" aria-label="안경렌즈 검색" placeholder="제조사, 제품군, 제품명, 굴절률 검색" value={spectacleSearch} onChange={(e) => setSpectacleSearch(e.target.value)} />
+          <p className="spectacle-note">에실로 가격표 · 원본 대조 전 검토용 데이터입니다. 실제 판매·견적 시 최신 가격표를 확인하세요.</p>
+          {spectacleError && <p className="alert-error">{spectacleError}</p>}
+          <p className="result-count">굴절률별 가격 {spectacleGroups.reduce((n,g) => n + g.families.reduce((m,f) => m + f.products.reduce((k,p) => k + p.variants.length,0),0),0)}개</p>
+          <div className="spectacle-groups">
+            {spectacleGroups.map((group) => (
+              <details className="brand-group" key={group.manufacturer} open={spectacleSearch.trim() ? true : undefined}>
+                <summary className="group-heading brand-heading">{group.manufacturer}<span className="group-chevron">⌄</span></summary>
+                <div className="category-list">
+                  {group.families.map((family) => (
+                    <details className="category-group" key={family.family} open={spectacleSearch.trim() ? true : undefined}>
+                      <summary className="group-heading category-heading">{family.family}<span className="group-count">{family.products.length}개 제품</span><span className="group-chevron">⌄</span></summary>
+                      <div className="spectacle-products">
+                        {family.products.map((product) => (
+                          <details className="spectacle-product" key={product.name} open={spectacleSearch.trim() ? true : undefined}>
+                            <summary className="spectacle-product-title">{product.name}<span className="group-chevron">⌄</span></summary>
+                            <div className="spectacle-variants">
+                              {product.variants.map((v,i) => (
+                                <div className="spectacle-variant" key={`${v.index}-${i}`}>
+                                  <span>굴절률 {v.index}</span>
+                                  <strong>{v.price === null ? '가격 확인 필요' : priceText(v.price)}</strong>
+                                </div>
+                              ))}
+                            </div>
+                          </details>
+                        ))}
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </details>
+            ))}
+          </div>
+          {!spectacleError && spectacleGroups.length === 0 && <p className="no-results">검색 결과가 없습니다.</p>}
+        </section>
+      )}
+
+      {lensTab === 'contact' && <>
+      {/* Customer view: search + brand filter + product list */}
+      <section className="customer-section">
+        <div className="search-bar">
+          <input
+            className="search-input"
+            placeholder="브랜드, 제품명, 규격 검색"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <select
+            className="brand-filter"
+            value={brandFilter}
+            onChange={(e) => setBrandFilter(e.target.value)}
+          >
+            {brands.map((b) => (
+              <option key={b} value={b}>{b}</option>
+            ))}
+          </select>
+        </div>
+
+        <p className="result-count">검색 결과 {filteredLenses.length}개</p>
+
+        <div className="card-list grouped-list">
+          {groupedLenses.map(({ brandName, categories }) => (
+            <details className="brand-group" key={`${search.trim()}|${brandName}`} open={search.trim() ? true : undefined}>
+              <summary className="group-heading brand-heading">
+                <span className="group-heading-text">{brandName}</span>
+                <span className="group-count">{categories.reduce((total, c) => total + c.items.length, 0)}개</span>
+                <span className="group-chevron" aria-hidden="true">⌄</span>
+              </summary>
+              <div className="category-list">
+                {categories.map(({ categoryName, items }) => (
+                  <details className="category-group" key={`${search.trim()}|${brandName}|${categoryName}`} open={search.trim() ? true : undefined}>
+                    <summary className="group-heading category-heading">
+                      <span className="group-heading-text">{categoryName}</span>
+                      <span className="group-count">{items.length}개</span>
+                      <span className="group-chevron" aria-hidden="true">⌄</span>
+                    </summary>
+                    <div className="category-cards">
+                      {items.map((lens) => (
+                    <article className="lens-card" key={lens.id}>
+                      <div className="card-left">
+                        <span className="brand-badge">{lens.brand}</span>
+                        <h2 className="product-name">{lens.productName}</h2>
+                        <div className="card-meta">
+                          {lens.lensType && <span className="meta-tag">{lens.lensType}</span>}
+                          {lens.wearType && <span className="meta-tag">{lens.wearType}</span>}
+                          {lens.packQuantity && (
+                            <span className="meta-tag meta-pack">{lens.packQuantity}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="card-right">
+                        <div className="price-block">
+                          <span className="price-main">{priceText(lens.displayPrice)}</span>
+                          {lens.oldPrice !== null && (
+                            <span className="price-old">
+                              이전 {priceText(lens.oldPrice)}
+                            </span>
+                          )}
+                          {lens.unitPrice !== null && (
+                            <span className="price-unit">
+                              1개당 {priceText(lens.unitPrice)}
+                            </span>
+                          )}
+                          {lens.displayPrice === null && lens.unitPrice === null && lens.price > 0 && (
+                            <span className="price-main">{lens.price.toLocaleString('ko-KR')}원</span>
+                          )}
+                        </div>
+                        {user && (
+                          <div className="card-actions">
+                            <button className="btn-sm btn-edit" onClick={() => editLens(lens)}>수정</button>
+                            <button className="btn-sm btn-del" onClick={() => removeLens(lens.id)}>삭제</button>
+                          </div>
+                        )}
+                      </div>
+                    </article>
+                      ))}
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </details>
+          ))}
+        </div>
+
+        {filteredLenses.length === 0 && (
+          <p className="no-results">검색 결과가 없습니다.</p>
+        )}
+      </section>
+
+      </>}
+
+      {/* Admin section */}
+      <div className="admin-toggle">
+        <button className="btn-toggle" onClick={() => setAdminOpen(!adminOpen)}>
+          {adminOpen ? '관리자 메뉴 닫기' : '관리자'}
+        </button>
+      </div>
+
+      {adminOpen && (
+        <section className="admin-section">
+          {!user ? (
+            <div className="admin-login">
+              <h2>관리자 로그인</h2>
+              <div className="form-row">
+                <input
+                  type="email"
+                  className="form-input"
+                  placeholder="관리자 이메일"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="form-row">
+                <input
+                  type="password"
+                  className="form-input"
+                  placeholder="비밀번호"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') login(); }}
+                />
+              </div>
+              <button className="btn-primary" onClick={login}>로그인</button>
+            </div>
+          ) : (
+            <div className="admin-panel">
+              <div className="admin-header">
+                <h2>상품 관리</h2>
+                <span className="admin-email">{user.email}</span>
+              </div>
+
+              {/* CSV Upload */}
+              <div className="csv-section">
+                <h3>CSV 일괄 등록</h3>
+                <p className="csv-help">
+                  엑셀에서 CSV 파일로 저장한 후 아래 버튼으로 선택하세요.
+                  업로드 전에 미리 확인할 수 있습니다.
+                </p>
+
+                <div className="quick-replace-section">
+                  <button
+                    className="btn-primary btn-danger btn-large"
+                    onClick={quickReplaceAll}
+                    disabled={replacing}
+                  >
+                    {replacing ? '교체 중...' : '첨부 파일로 전체 교체 (기존 데이터 삭제 + 새 등록)'}
+                  </button>
+                  <p className="quick-replace-hint">
+                    이 버튼을 누르면 기존 데이터를 모두 삭제하고 첨부된 가격표 161개로 새로 교체합니다.
+                  </p>
+                </div>
+
+                <div className="csv-upload-row">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".csv,text/csv"
+                    onChange={handleFileSelect}
+                    className="file-input"
+                  />
+                  <button className="btn-secondary btn-bundled" onClick={() => loadBundledCsv()}>
+                    첨부 파일 미리보기
+                  </button>
+                  {csvFileName && (
+                    <button className="btn-sm btn-cancel" onClick={clearCsv}>취소</button>
+                  )}
+                </div>
+
+                <div className="csv-mode-row">
+                  <label className="csv-mode-label">
+                    <input
+                      type="checkbox"
+                      checked={replaceMode}
+                      onChange={(e) => setReplaceMode(e.target.checked)}
+                    />
+                    기존 데이터 삭제 후 새로 교체
+                  </label>
+                </div>
+
+                {csvError && <p className="alert-error" role="alert">{csvError}</p>}
+                {csvSuccess && <p className="alert-success">{csvSuccess}</p>}
+
+                {csvRows.length > 0 && (
+                  <div className="csv-preview">
+                    <div className="csv-preview-header">
+                      <strong>미리보기: {csvRows.length}개 항목</strong>
+                      {csvDuplicates.length > 0 && (
+                        <span className="dup-warning">
+                          중복 {csvDuplicates.length}개 (업로드 불가)
+                        </span>
+                      )}
+                      {csvDuplicates.length === 0 && (
+                        <span className="dup-ok">중복 없음 — 등록 가능 {nonDupCount}개</span>
+                      )}
+                    </div>
+
+                    {csvDuplicates.length > 0 && (
+                      <div className="dup-list">
+                        <p className="dup-title">중복 항목 (기존 상품과 겹침):</p>
+                        <ul>
+                          {csvDuplicates.map((d) => (
+                            <li key={d.index}>
+                              {d.row.brand} — {d.row.productName} ({d.row.packQuantity})
+                              <span className="dup-existing">
+                                (기존: {d.existingProductName})
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="dup-hint">
+                          중복 항목을 CSV 파일에서 삭제하거나 제품명을 변경한 후 다시 선택해 주세요.
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="csv-table-wrap">
+                      <table className="csv-table">
+                        <thead>
+                          <tr>
+                            <th>브랜드</th>
+                            <th>렌즈구분</th>
+                            <th>제품명</th>
+                            <th>착용유형</th>
+                            <th>포장수량</th>
+                            <th>권장/표시가격</th>
+                            <th>이전 가격</th>
+                            <th>1개당 가격</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {csvRows.map((row, i) => {
+                            const isDup = csvDuplicates.some((d) => d.index === i);
+                            return (
+                              <tr key={i} className={isDup ? 'row-dup' : ''}>
+                                <td>{row.brand}</td>
+                                <td>{row.lensType}</td>
+                                <td>{row.productName}</td>
+                                <td>{row.wearType}</td>
+                                <td>{row.packQuantity}</td>
+                                <td>{priceText(row.displayPrice)}</td>
+                                <td>{priceText(row.oldPrice)}</td>
+                                <td>{priceText(row.unitPrice)}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {replaceMode ? (
+                      <button
+                        className="btn-primary btn-danger"
+                        onClick={replaceAllData}
+                        disabled={replacing || csvDuplicates.length > 0}
+                      >
+                        {replacing ? '교체 중...' : `기존 데이터 삭제 후 ${nonDupCount}개 등록`}
+                      </button>
+                    ) : (
+                      <button
+                        className="btn-primary"
+                        onClick={uploadCsv}
+                        disabled={csvUploading || csvDuplicates.length > 0}
+                      >
+                        {csvUploading ? '업로드 중...' : `${nonDupCount}개 등록`}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <hr className="divider" />
+
+              {/* Single product edit form */}
+              <div className="edit-section">
+                <h3>{editingId ? '상품 수정' : '상품 개별 추가'}</h3>
+                <div className="form-grid">
+                  <div className="form-row">
+                    <label className="form-label">브랜드</label>
+                    <input
+                      className="form-input"
+                      placeholder="예: 클라렌"
+                      value={brand}
+                      onChange={(e) => setBrand(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">렌즈 구분</label>
+                    <input
+                      className="form-input"
+                      placeholder="예: 투명, 컬러"
+                      value={lensType}
+                      onChange={(e) => setLensType(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">제품명</label>
+                    <input
+                      className="form-input"
+                      placeholder="제품명"
+                      value={productName}
+                      onChange={(e) => setProductName(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">착용 유형</label>
+                    <input
+                      className="form-input"
+                      placeholder="예: 1일, 1개월"
+                      value={wearType}
+                      onChange={(e) => setWearType(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">포장수량</label>
+                    <input
+                      className="form-input"
+                      placeholder="예: 30개입"
+                      value={packQuantity}
+                      onChange={(e) => setPackQuantity(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">규격 (기존)</label>
+                    <input
+                      className="form-input"
+                      placeholder="예: 30개입"
+                      value={specification}
+                      onChange={(e) => setSpecification(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">권장/표시가격</label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="비어 있으면 미입력"
+                      value={displayPrice}
+                      onChange={(e) => setDisplayPrice(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">이전 가격</label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="비어 있으면 미입력"
+                      value={oldPrice}
+                      onChange={(e) => setOldPrice(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">1개당 가격</label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="비어 있으면 미입력"
+                      value={unitPrice}
+                      onChange={(e) => setUnitPrice(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-actions">
+                  <button className="btn-primary" onClick={saveLens}>
+                    {editingId ? '수정 저장' : '상품 추가'}
+                  </button>
+                  <button className="btn-secondary" onClick={resetForm}>입력 초기화</button>
+                  <button className="btn-secondary" onClick={() => signOut(auth)}>로그아웃</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      <footer className="footer">
+        <small>GLOSS OPTICAL · CONTACT LENS PRICE</small>
+      </footer>
+    </div>
+  );
 }
-
-@media (max-width: 480px) {
-  .header h1 {
-    font-size: 20px;
-  }
-
-  .lens-card {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .card-right {
-    text-align: left;
-    align-items: flex-start;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-    min-width: 0;
-  }
-
-  .price-block {
-    align-items: flex-start;
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .form-actions {
-    flex-direction: column;
-  }
-
-  .form-actions button {
-    width: 100%;
-  }
-
-  .csv-table {
-    font-size: 12px;
-  }
-
-  .csv-table th,
-  .csv-table td {
-    padding: 5px 6px;
-  }
-}
-/* ===== GLOSS mobile card design refinements ===== */
-:root {
-  --text-strong: #20212d;
-  --text-body: #454653;
-  --text-muted: #737582;
-  --surface: #ffffff;
-  --border: #e0e2e6;
-  --primary: #225c80;
-  --primary-bg: #edf3f7;
-  --primary-light: #8db7d2;
-  --secondary: #31835f;
-  --secondary-bg: #edf6f1;
-  --tag-bg: #f1f2f4;
-}
-
-.customer-section { background: #f7f8fa; }
-.result-count { text-align: left; }
-.lens-card { text-align: left; align-items: flex-start; }
-.card-left { text-align: left; }
-.brand-badge { color: #245c7e; background: #edf3f7; }
-.product-name { color: #20212d; }
-.meta-tag { background: #f0f1f3; color: #737582; }
-.meta-pack { background: #edf6f1; color: #31835f; }
-.price-main { color: #20212d; }
-.price-unit { color: #31835f; }
-@media (max-width: 480px) {
-  .lens-card { padding: 15px 14px; gap: 10px; }
-  .card-right { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
-  .price-block { align-items: flex-start; }
-  .price-main { font-size: 18px; }
-  .price-unit { font-size: 12px; }
-  .brand-badge { margin-bottom: 6px; }
-  .product-name { font-size: 17px; margin-bottom: 8px; }
-  .card-meta { gap: 6px; }
-}
-
-/* Brand / product category accordion */
-.grouped-list { display:flex; flex-direction:column; gap:12px; }
-.brand-group, .category-group { min-width:0; }
-.brand-group { background:#fff; border:1px solid #e0e2e6; border-radius:14px; overflow:hidden; }
-.group-heading { display:flex; align-items:center; gap:10px; cursor:pointer; list-style:none; text-align:left; user-select:none; }
-.group-heading::-webkit-details-marker { display:none; }
-.brand-heading { padding:17px 18px; background:#fff; font-size:17px; font-weight:750; color:#20212d; }
-.category-list { padding:0 12px 12px; display:flex; flex-direction:column; gap:8px; }
-.category-group { border:1px solid #e7e9ec; border-radius:10px; overflow:hidden; background:#f7f8fa; }
-.category-heading { padding:12px 14px; color:#454653; font-size:14px; font-weight:650; }
-.group-heading-text { flex:1; min-width:0; }
-.group-count { flex:none; color:#31835f; background:#edf6f1; border-radius:999px; padding:3px 9px; font-size:12px; font-weight:600; }
-.group-chevron { font-size:22px; line-height:1; color:#737582; transition:transform .18s ease; }
-details[open] > summary .group-chevron { transform:rotate(180deg); }
-.category-cards { padding:0 8px 10px; display:flex; flex-direction:column; gap:8px; }
-.category-cards .lens-card { margin:0; background:#fff; }
-@media (max-width:480px) {
- .brand-heading { padding:15px 14px; font-size:16px; }
- .category-list { padding:0 8px 8px; }
- .category-heading { padding:11px 12px; }
- .category-cards { padding:0 6px 8px; }
-}
-
-/* 안경렌즈 탭: 기존 콘택트렌즈 스타일을 변경하지 않습니다. */
-.lens-type-tabs{display:flex;gap:8px;margin:16px 0;padding:5px;background:#f1f1f1;border-radius:14px}
-.lens-type-tab{flex:1;padding:13px 8px;border:0;border-radius:10px;background:transparent;font-weight:700;font-size:15px;color:#666;cursor:pointer}
-.lens-type-tab.active{background:#202020;color:#f3d28b;box-shadow:0 2px 8px #0002}
-.spectacle-section{padding-bottom:20px}
-.spectacle-search{width:100%;box-sizing:border-box;margin-bottom:8px}
-.spectacle-note{font-size:12px;line-height:1.6;color:#846227;margin:8px 2px 16px}
-.spectacle-groups{display:grid;gap:10px}
-.spectacle-products{padding:8px 10px 12px;display:grid;gap:8px}
-.spectacle-product{border:1px solid #e6e6e6;border-radius:10px;background:white;overflow:hidden}
-.spectacle-product-title{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:14px;font-weight:700;list-style:none}
-.spectacle-product-title::-webkit-details-marker{display:none}
-.spectacle-variants{border-top:1px solid #eee;padding:4px 14px}
-.spectacle-variant{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #f0f0f0;font-size:14px}
-.spectacle-variant:last-child{border-bottom:0}
-.spectacle-variant strong{white-space:nowrap}
