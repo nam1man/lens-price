@@ -504,6 +504,25 @@ export default function App() {
       });
   }, [lenses, search, brandFilter]);
 
+  // Group the currently filtered products without changing Firestore data.
+  const groupedLenses = useMemo(() => {
+    const grouped = new Map<string, Map<string, Lens[]>>();
+    for (const lens of filteredLenses) {
+      const brandName = lens.brand.trim() || '기타 브랜드';
+      const category = [lens.wearType.trim(), lens.lensType.trim()]
+        .filter(Boolean)
+        .join(' · ') || '기타 제품군';
+      if (!grouped.has(brandName)) grouped.set(brandName, new Map());
+      const categories = grouped.get(brandName)!;
+      if (!categories.has(category)) categories.set(category, []);
+      categories.get(category)!.push(lens);
+    }
+    return Array.from(grouped, ([brandName, categories]) => ({
+      brandName,
+      categories: Array.from(categories, ([categoryName, items]) => ({ categoryName, items })),
+    }));
+  }, [filteredLenses]);
+
   const nonDupCount = csvRows.length - csvDuplicates.length;
 
   return (
@@ -542,45 +561,67 @@ export default function App() {
 
         <p className="result-count">검색 결과 {filteredLenses.length}개</p>
 
-        <div className="card-list">
-          {filteredLenses.map((lens) => (
-            <article className="lens-card" key={lens.id}>
-              <div className="card-left">
-                <span className="brand-badge">{lens.brand}</span>
-                <h2 className="product-name">{lens.productName}</h2>
-                <div className="card-meta">
-                  {lens.lensType && <span className="meta-tag">{lens.lensType}</span>}
-                  {lens.wearType && <span className="meta-tag">{lens.wearType}</span>}
-                  {lens.packQuantity && (
-                    <span className="meta-tag meta-pack">{lens.packQuantity}</span>
-                  )}
-                </div>
+        <div className="card-list grouped-list">
+          {groupedLenses.map(({ brandName, categories }) => (
+            <details className="brand-group" key={`${search.trim()}|${brandName}`} open={search.trim() ? true : undefined}>
+              <summary className="group-heading brand-heading">
+                <span className="group-heading-text">{brandName}</span>
+                <span className="group-count">{categories.reduce((total, c) => total + c.items.length, 0)}개</span>
+                <span className="group-chevron" aria-hidden="true">⌄</span>
+              </summary>
+              <div className="category-list">
+                {categories.map(({ categoryName, items }) => (
+                  <details className="category-group" key={`${search.trim()}|${brandName}|${categoryName}`} open={search.trim() ? true : undefined}>
+                    <summary className="group-heading category-heading">
+                      <span className="group-heading-text">{categoryName}</span>
+                      <span className="group-count">{items.length}개</span>
+                      <span className="group-chevron" aria-hidden="true">⌄</span>
+                    </summary>
+                    <div className="category-cards">
+                      {items.map((lens) => (
+                    <article className="lens-card" key={lens.id}>
+                      <div className="card-left">
+                        <span className="brand-badge">{lens.brand}</span>
+                        <h2 className="product-name">{lens.productName}</h2>
+                        <div className="card-meta">
+                          {lens.lensType && <span className="meta-tag">{lens.lensType}</span>}
+                          {lens.wearType && <span className="meta-tag">{lens.wearType}</span>}
+                          {lens.packQuantity && (
+                            <span className="meta-tag meta-pack">{lens.packQuantity}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="card-right">
+                        <div className="price-block">
+                          <span className="price-main">{priceText(lens.displayPrice)}</span>
+                          {lens.oldPrice !== null && (
+                            <span className="price-old">
+                              이전 {priceText(lens.oldPrice)}
+                            </span>
+                          )}
+                          {lens.unitPrice !== null && (
+                            <span className="price-unit">
+                              1개당 {priceText(lens.unitPrice)}
+                            </span>
+                          )}
+                          {lens.displayPrice === null && lens.unitPrice === null && lens.price > 0 && (
+                            <span className="price-main">{lens.price.toLocaleString('ko-KR')}원</span>
+                          )}
+                        </div>
+                        {user && (
+                          <div className="card-actions">
+                            <button className="btn-sm btn-edit" onClick={() => editLens(lens)}>수정</button>
+                            <button className="btn-sm btn-del" onClick={() => removeLens(lens.id)}>삭제</button>
+                          </div>
+                        )}
+                      </div>
+                    </article>
+                      ))}
+                    </div>
+                  </details>
+                ))}
               </div>
-              <div className="card-right">
-                <div className="price-block">
-                  <span className="price-main">{priceText(lens.displayPrice)}</span>
-                  {lens.oldPrice !== null && (
-                    <span className="price-old">
-                      이전 {priceText(lens.oldPrice)}
-                    </span>
-                  )}
-                  {lens.unitPrice !== null && (
-                    <span className="price-unit">
-                      1개당 {priceText(lens.unitPrice)}
-                    </span>
-                  )}
-                  {lens.displayPrice === null && lens.unitPrice === null && lens.price > 0 && (
-                    <span className="price-main">{lens.price.toLocaleString('ko-KR')}원</span>
-                  )}
-                </div>
-                {user && (
-                  <div className="card-actions">
-                    <button className="btn-sm btn-edit" onClick={() => editLens(lens)}>수정</button>
-                    <button className="btn-sm btn-del" onClick={() => removeLens(lens.id)}>삭제</button>
-                  </div>
-                )}
-              </div>
-            </article>
+            </details>
           ))}
         </div>
 
